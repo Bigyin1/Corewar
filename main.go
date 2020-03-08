@@ -1,10 +1,9 @@
 package main
 
 import (
-	"calculator_ast/interpreter"
-	"calculator_ast/parser"
 	"calculator_ast/tokenizer"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
@@ -16,26 +15,28 @@ func evaluate(input string) string {
 		return ""
 	}
 	lex.Print()
-	prs := parser.NewParser(lex)
-	ast, err := prs.Parse()
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	intr := interpreter.NewInterpreter(ast)
-	result := intr.Evaluate()
-	return fmt.Sprint(result)
+	return ""
 }
 
 func main() {
-	input := ""
 	if len(os.Args) == 2 {
-		input = os.Args[1]
-		res := evaluate(input)
+		file := os.Args[1]
+		input, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		res := evaluate(string(input))
 		fmt.Println(res)
 		return
 	}
-	_, _ = fmt.Fscanf(os.Stdin, "%s", &input)
-	res := evaluate(input)
+	file := ""
+	_, _ = fmt.Fscanf(os.Stdin, "%s", &file)
+	input, err := ioutil.ReadFile(file)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	res := evaluate(string(input))
 	fmt.Println(res)
 }
