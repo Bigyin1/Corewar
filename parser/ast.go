@@ -1,33 +1,43 @@
 package parser
 
-import "calculator_ast/tokenizer"
+import (
+	"calculator_ast/tokenizer"
+	"fmt"
+)
 
-type AST interface {
-	GetChildren() []AST
-	GetToken() tokenizer.Token
-}
-type BinOpASTNode struct {
-	left  AST
-	right AST
-	token tokenizer.Token
-}
-
-func (b *BinOpASTNode) GetChildren() []AST {
-	return []AST{b.left, b.right}
+type ProgramNode struct {
+	ChampName    string
+	ChampComment string
+	Code         CodeNode
 }
 
-func (b *BinOpASTNode) GetToken() tokenizer.Token {
-	return b.token
+func (pr ProgramNode) PrintTree() {
+	fmt.Print("\t\t")
+	fmt.Print(pr.ChampName)
+	fmt.Print("\t")
+	fmt.Print(pr.ChampComment)
+
 }
 
-type NumASTNode struct {
-	token tokenizer.Token
+type CodeNode struct {
+	Commands []CommandNode
 }
 
-func (b *NumASTNode) GetChildren() []AST {
-	return []AST{}
+type CommandNode struct {
+	Label       []LabelNode
+	Instruction *InstructionNode
 }
 
-func (b *NumASTNode) GetToken() tokenizer.Token {
-	return b.token
+type LabelNode struct {
+	Name string
+}
+
+type InstructionNode struct {
+	InstructionName tokenizer.InstructionName
+	Args            []InstructionArgument
+}
+
+type InstructionArgument struct {
+	Token tokenizer.Token
+	Type  tokenizer.ArgumentType
 }
