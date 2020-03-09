@@ -19,9 +19,9 @@ func (v DirectTokenVal) GetValue() int {
 	return r
 }
 
-type InDirectTokenVal string
+type IndirectTokenVal string
 
-func (v InDirectTokenVal) GetValue() int {
+func (v IndirectTokenVal) GetValue() int {
 	r, _ := strconv.Atoi(string(v))
 	return r
 }

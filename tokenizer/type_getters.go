@@ -43,10 +43,10 @@ func (t *Tokenizer) isString(currStr string) (string, bool) {
 	return "", false
 }
 
-func (t *Tokenizer) isInstruction(currStr string) (string, bool) {
-	currInstr := ""
+func (t *Tokenizer) isInstruction(currStr string) (InstructionName, bool) {
+	currInstr := InstructionName("")
 	for instrName := range Instructions {
-		if strings.HasPrefix(currStr, instrName) && len(instrName) > len(currInstr) {
+		if strings.HasPrefix(currStr, string(instrName)) && len(instrName) > len(currInstr) {
 			currInstr = instrName
 		}
 	}
@@ -103,14 +103,14 @@ func (t *Tokenizer) isDirect(currStr string) (string, bool) {
 	return res.String(), true
 }
 
-func (t *Tokenizer) isInDirect(currStr string) (InDirectTokenVal, bool) {
+func (t *Tokenizer) isInDirect(currStr string) (IndirectTokenVal, bool) {
 	res := strings.Builder{}
 	val, err := parserIntFromStr(currStr)
 	if err != nil {
 		return "", false
 	}
 	_, _ = res.WriteString(strconv.Itoa(val))
-	return InDirectTokenVal(res.String()), true
+	return IndirectTokenVal(res.String()), true
 }
 
 func (t *Tokenizer) isDirectLabel(currStr string) (string, bool) {
@@ -163,14 +163,14 @@ func (t *Tokenizer) getTokenType() (Token, int, error) {
 	currStr := t.input[t.currIdx:]
 	if strings.HasPrefix(currStr, nameHeader) {
 		return Token{
-			Typ:   Name,
+			Typ:   ChampName,
 			Value: nameHeader,
 		}, len(nameHeader), nil
 	}
 
 	if strings.HasPrefix(currStr, commentHeader) {
 		return Token{
-			Typ:   Comment,
+			Typ:   ChampComment,
 			Value: commentHeader,
 		}, len(commentHeader), nil
 	}

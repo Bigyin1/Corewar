@@ -1,6 +1,8 @@
 package main
 
 import (
+	"calculator_ast/compiler"
+	"calculator_ast/parser"
 	"calculator_ast/tokenizer"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +17,15 @@ func evaluate(input string) string {
 		return ""
 	}
 	lex.Print()
+
+	pars := parser.NewParser(lex)
+	res, err := pars.Parse()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	instrValidator := compiler.NewInstructionsValidator(res)
+	instrValidator.ValidateInstructions()
 	return ""
 }
 
