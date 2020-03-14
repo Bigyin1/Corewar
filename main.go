@@ -26,6 +26,24 @@ func evaluate(input string) string {
 	}
 	instrValidator := compiler.NewInstructionsValidator(res)
 	instrValidator.ValidateInstructions()
+	off := compiler.NewInstructionOffsetIndexer(res)
+	off.SetOffsets()
+	c := compiler.NewCompiler(res)
+	err = c.SetupLabelsTable()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	err = c.FillArgValues()
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	//code := c.GetByteCode()
+	c.PrintAnnotatedCode()
+	//for _, b := range code {
+	//	fmt.Printf("%02x ", b)
+	//}
 	return ""
 }
 

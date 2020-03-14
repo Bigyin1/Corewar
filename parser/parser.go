@@ -11,58 +11,69 @@ type Parser struct {
 }
 
 func (p *Parser) eatLineBreaksSpaces() {
-	for p.currentToken.Typ == tokenizer.LineBreak || p.currentToken.Typ == tokenizer.Space {
-		_ = p.eatToken(p.currentToken.Typ)
+	for p.currentToken.Type == tokenizer.LineBreak || p.currentToken.Type == tokenizer.Space {
+		_ = p.eatToken(p.currentToken.Type)
 	}
 }
 
 func (p *Parser) eatLineBreaks() {
-	for p.currentToken.Typ == tokenizer.LineBreak {
+	for p.currentToken.Type == tokenizer.LineBreak {
 		_ = p.eatToken(tokenizer.LineBreak)
 	}
 }
 
 func (p *Parser) eatSpaces() {
-	for p.currentToken.Typ == tokenizer.Space {
+	for p.currentToken.Type == tokenizer.Space {
 		_ = p.eatToken(tokenizer.Space)
 	}
 }
 
 func (p *Parser) eatToken(tokenType tokenizer.TokenType) error {
-	if p.currentToken.Typ == tokenType {
+	if p.currentToken.Type == tokenType {
 		p.currentToken = p.lexer.GetNextToken()
 		return nil
 	}
-	return fmt.Errorf("unexpected token: %s, exp: %s", tokenType, p.currentToken)
+	return fmt.Errorf("unexpected token at line: %d, col: %d",
+		p.currentToken.PosLine, p.currentToken.PosColumn)
+}
+
+func (p *Parser) argument(instrName tokenizer.InstructionName) InstructionArgument {
+	argType := p.currentToken.Type.GetArgType()
+	arg := InstructionArgument{Token: p.currentToken, Type: argType}
+	if p.currentToken.Type.IsDirectArgType() {
+		arg.Type.Size = tokenizer.InstructionsConfig[instrName].TDirSize // set alternative dir size
+	}
+	_ = p.eatToken(p.currentToken.Type)
+	return arg
 }
 
 func (p *Parser) instruction() (InstructionNode, error) {
 	instrNode := InstructionNode{}
-	instrNode.InstructionName = p.currentToken.Value.(tokenizer.InstructionName)
+	instrNode.Name = p.currentToken.Value.(tokenizer.InstructionName)
+	instrNode.Token = p.currentToken
+	instrNode.Meta = tokenizer.InstructionsConfig[instrNode.Name]
 	err := p.eatToken(tokenizer.Instr)
 	if err != nil {
 		return InstructionNode{}, err
 	}
-	if p.currentToken.Typ.IsOfArgType() {
-		argType := p.currentToken.Typ.GetArgType()
-		arg := InstructionArgument{Token: p.currentToken, Type: argType}
-		_ = p.eatToken(p.currentToken.Typ)
+	if p.currentToken.Type.IsOfArgType() {
+		arg := p.argument(instrNode.Name)
 		instrNode.Args = append(instrNode.Args, arg)
 	} else {
-		return InstructionNode{}, fmt.Errorf("got instructions w/o arguments")
+		return InstructionNode{}, fmt.Errorf("got instruction w/o arguments; line: %d, col: %d",
+			p.currentToken.PosLine, p.currentToken.PosColumn)
 	}
-	for p.currentToken.Typ == tokenizer.Separator {
+	for p.currentToken.Type == tokenizer.Separator {
 		err := p.eatToken(tokenizer.Separator)
 		if err != nil {
 			return InstructionNode{}, err
 		}
-		if p.currentToken.Typ.IsOfArgType() {
-			argType := p.currentToken.Typ.GetArgType()
-			arg := InstructionArgument{Token: p.currentToken, Type: argType}
-			_ = p.eatToken(p.currentToken.Typ)
+		if p.currentToken.Type.IsOfArgType() {
+			arg := p.argument(instrNode.Name)
 			instrNode.Args = append(instrNode.Args, arg)
 		} else {
-			return InstructionNode{}, fmt.Errorf("got separator w/o instruction")
+			return InstructionNode{}, fmt.Errorf("got separator w/o instruction; line: %d, col: %d",
+				p.currentToken.PosLine, p.currentToken.PosColumn)
 		}
 	}
 	return instrNode, nil
@@ -70,15 +81,15 @@ func (p *Parser) instruction() (InstructionNode, error) {
 
 func (p *Parser) command() (CommandNode, error) {
 	cmdNode := CommandNode{}
-	for p.currentToken.Typ == tokenizer.Label {
-		label := LabelNode{Name: p.currentToken.Value.(string)}
-		cmdNode.Label = append(cmdNode.Label, label)
+	for p.currentToken.Type == tokenizer.Label {
+		label := LabelNode{Name: p.currentToken.Value.(string), Token: p.currentToken}
+		cmdNode.Labels = append(cmdNode.Labels, label)
 		_ = p.eatToken(tokenizer.Label)
 		p.eatLineBreaks()
 	}
 	p.eatLineBreaks()
 	// for the case of label at the end of code block
-	if p.currentToken.Typ == tokenizer.Instr {
+	if p.currentToken.Type == tokenizer.Instr {
 		instNode, err := p.instruction()
 		if err != nil {
 			return CommandNode{}, err
@@ -94,7 +105,7 @@ func (p *Parser) command() (CommandNode, error) {
 
 func (p *Parser) codeBlock() (CodeNode, error) {
 	codeNode := CodeNode{}
-	if p.currentToken.Typ == tokenizer.Label || p.currentToken.Typ == tokenizer.Instr {
+	if p.currentToken.Type == tokenizer.Label || p.currentToken.Type == tokenizer.Instr {
 		cmdNode, err := p.command()
 		if err != nil {
 			return CodeNode{}, err
@@ -104,7 +115,7 @@ func (p *Parser) codeBlock() (CodeNode, error) {
 		return CodeNode{}, fmt.Errorf("no instructions provided")
 	}
 	p.eatLineBreaks()
-	for p.currentToken.Typ == tokenizer.Label || p.currentToken.Typ == tokenizer.Instr {
+	for p.currentToken.Type == tokenizer.Label || p.currentToken.Type == tokenizer.Instr {
 		cmdNode, err := p.command()
 		if err != nil {
 			return CodeNode{}, err
@@ -160,7 +171,7 @@ func (p *Parser) name() (string, error) {
 func (p *Parser) program() (ProgramNode, error) {
 	champName := ""
 	champComment := ""
-	if p.currentToken.Typ == tokenizer.ChampName {
+	if p.currentToken.Type == tokenizer.ChampName {
 		n, err := p.name()
 		if err != nil {
 			return ProgramNode{}, err
@@ -172,7 +183,7 @@ func (p *Parser) program() (ProgramNode, error) {
 			return ProgramNode{}, err
 		}
 		champComment = c
-	} else if p.currentToken.Typ == tokenizer.ChampComment {
+	} else if p.currentToken.Type == tokenizer.ChampComment {
 		c, err := p.comment()
 		if err != nil {
 			return ProgramNode{}, err

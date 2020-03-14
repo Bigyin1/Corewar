@@ -16,7 +16,7 @@ func (tt TokenType) IsDirectArgType() bool {
 	return false
 }
 
-func (tt TokenType) IsInDirectArgType() bool {
+func (tt TokenType) IsIndirectArgType() bool {
 	if tt == Indirect || tt == IndirectLabel {
 		return true
 	}

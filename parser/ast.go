@@ -2,7 +2,6 @@ package parser
 
 import (
 	"calculator_ast/tokenizer"
-	"fmt"
 )
 
 type ProgramNode struct {
@@ -11,33 +10,32 @@ type ProgramNode struct {
 	Code         CodeNode
 }
 
-func (pr ProgramNode) PrintTree() {
-	fmt.Print("\t\t")
-	fmt.Print(pr.ChampName)
-	fmt.Print("\t")
-	fmt.Print(pr.ChampComment)
-
-}
-
 type CodeNode struct {
 	Commands []CommandNode
 }
 
 type CommandNode struct {
-	Label       []LabelNode
+	Labels      []LabelNode
 	Instruction *InstructionNode
 }
 
 type LabelNode struct {
-	Name string
+	Token       tokenizer.Token
+	Name        string
+	OffsetBytes int
 }
 
 type InstructionNode struct {
-	InstructionName tokenizer.InstructionName
-	Args            []InstructionArgument
+	Token       tokenizer.Token
+	Name        tokenizer.InstructionName
+	Meta        tokenizer.InstructionMeta
+	Args        []InstructionArgument
+	OffsetBytes int
+	Size        int // for debug, not used in logic
 }
 
 type InstructionArgument struct {
 	Token tokenizer.Token
 	Type  tokenizer.ArgumentType
+	Value interface{}
 }

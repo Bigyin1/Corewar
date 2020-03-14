@@ -11,11 +11,10 @@ func (t *Tokenizer) isLabel(currStr string) (string, bool) {
 	hasTerminate := false
 	for idx := range currStr {
 		if currStr[idx] == ':' {
-			label.WriteByte(':')
 			hasTerminate = true
 			break
 		}
-		if !strings.Contains(labelChars, string(currStr[idx])) {
+		if !strings.Contains(LabelChars, string(currStr[idx])) {
 			return "", false
 		}
 		label.WriteByte(currStr[idx])
@@ -45,7 +44,7 @@ func (t *Tokenizer) isString(currStr string) (string, bool) {
 
 func (t *Tokenizer) isInstruction(currStr string) (InstructionName, bool) {
 	currInstr := InstructionName("")
-	for instrName := range Instructions {
+	for instrName := range InstructionsConfig {
 		if strings.HasPrefix(currStr, string(instrName)) && len(instrName) > len(currInstr) {
 			currInstr = instrName
 		}
@@ -89,7 +88,7 @@ func (t *Tokenizer) isSeparator(currStr string) (string, bool) {
 	return "", false
 }
 
-func (t *Tokenizer) isDirect(currStr string) (string, bool) {
+func (t *Tokenizer) isDirect(currStr string) (DirectTokenVal, bool) {
 	res := strings.Builder{}
 	if currStr[0] != '%' {
 		return "", false
@@ -100,7 +99,7 @@ func (t *Tokenizer) isDirect(currStr string) (string, bool) {
 		return "", false
 	}
 	_, _ = res.WriteString(strconv.Itoa(val))
-	return res.String(), true
+	return DirectTokenVal(res.String()), true
 }
 
 func (t *Tokenizer) isInDirect(currStr string) (IndirectTokenVal, bool) {
@@ -113,7 +112,7 @@ func (t *Tokenizer) isInDirect(currStr string) (IndirectTokenVal, bool) {
 	return IndirectTokenVal(res.String()), true
 }
 
-func (t *Tokenizer) isDirectLabel(currStr string) (string, bool) {
+func (t *Tokenizer) isDirectLabel(currStr string) (DirectLabelTokenVal, bool) {
 	if len(currStr) <= 2 {
 		return "", false
 	}
@@ -125,7 +124,7 @@ func (t *Tokenizer) isDirectLabel(currStr string) (string, bool) {
 	res.WriteByte(':')
 	labelStr := currStr[2:]
 	for i := range labelStr {
-		if !strings.Contains(labelChars, string(labelStr[i])) {
+		if !strings.Contains(LabelChars, string(labelStr[i])) {
 			if i == 0 {
 				return "", false
 			}
@@ -134,10 +133,10 @@ func (t *Tokenizer) isDirectLabel(currStr string) (string, bool) {
 		res.WriteByte(labelStr[i])
 	}
 
-	return res.String(), true
+	return DirectLabelTokenVal(res.String()), true
 }
 
-func (t *Tokenizer) isInDirectLabel(currStr string) (string, bool) {
+func (t *Tokenizer) isInDirectLabel(currStr string) (IndirectLabelTokenVal, bool) {
 	if len(currStr) <= 1 {
 		return "", false
 	}
@@ -148,7 +147,7 @@ func (t *Tokenizer) isInDirectLabel(currStr string) (string, bool) {
 	res.WriteByte(':')
 	labelStr := currStr[1:]
 	for i := range labelStr {
-		if !strings.Contains(labelChars, string(labelStr[i])) {
+		if !strings.Contains(LabelChars, string(labelStr[i])) {
 			if i == 0 {
 				return "", false
 			}
@@ -156,105 +155,105 @@ func (t *Tokenizer) isInDirectLabel(currStr string) (string, bool) {
 		}
 		res.WriteByte(labelStr[i])
 	}
-	return res.String(), true
+	return IndirectLabelTokenVal(res.String()), true
 }
 
 func (t *Tokenizer) getTokenType() (Token, int, error) {
 	currStr := t.input[t.currIdx:]
-	if strings.HasPrefix(currStr, nameHeader) {
+	if strings.HasPrefix(currStr, NameHeader) {
 		return Token{
-			Typ:   ChampName,
-			Value: nameHeader,
-		}, len(nameHeader), nil
+			Type:  ChampName,
+			Value: NameHeader,
+		}, len(NameHeader), nil
 	}
 
-	if strings.HasPrefix(currStr, commentHeader) {
+	if strings.HasPrefix(currStr, CommentHeader) {
 		return Token{
-			Typ:   ChampComment,
-			Value: commentHeader,
-		}, len(commentHeader), nil
+			Type:  ChampComment,
+			Value: CommentHeader,
+		}, len(CommentHeader), nil
 	}
 	if strings.HasPrefix(currStr, " ") || strings.HasPrefix(currStr, "\t") {
 		return Token{
-			Typ:   Space,
+			Type:  Space,
 			Value: string(currStr[0]),
 		}, 1, nil
 	}
 	if strings.HasPrefix(currStr, "\n") {
 		return Token{
-			Typ:   LineBreak,
+			Type:  LineBreak,
 			Value: BreakLineTokenVal("\n"),
 		}, 1, nil
 	}
 	if strings.HasPrefix(currStr, "+") {
 		return Token{
-			Typ:   Sum,
+			Type:  Sum,
 			Value: "+",
 		}, 1, nil
 	}
 	if strings.HasPrefix(currStr, "-") {
 		return Token{
-			Typ:   Sub,
+			Type:  Sub,
 			Value: "-",
 		}, 1, nil
 	}
 	if label, ok := t.isLabel(currStr); ok {
 		return Token{
-			Typ:   Label,
+			Type:  Label,
 			Value: label,
-		}, len(label), nil
+		}, len(label) + 1, nil
 	}
 
 	if str, ok := t.isString(currStr); ok {
 		return Token{
-			Typ:   Str,
+			Type:  Str,
 			Value: str,
 		}, len(str), nil
 	}
 
 	if i, ok := t.isInstruction(currStr); ok {
 		return Token{
-			Typ:   Instr,
+			Type:  Instr,
 			Value: i,
 		}, len(i), nil
 	}
 
 	if i, ok := t.isRegister(currStr); ok {
 		return Token{
-			Typ:   Register,
+			Type:  Register,
 			Value: i,
 		}, len(i), nil
 	}
 
 	if i, ok := t.isSeparator(currStr); ok {
 		return Token{
-			Typ:   Separator,
+			Type:  Separator,
 			Value: i,
 		}, len(i), nil
 	}
 
 	if direct, ok := t.isDirect(currStr); ok {
 		return Token{
-			Typ:   Direct,
+			Type:  Direct,
 			Value: direct,
 		}, len(direct), nil
 	}
 
 	if direct, ok := t.isDirectLabel(currStr); ok {
 		return Token{
-			Typ:   DirectLabel,
+			Type:  DirectLabel,
 			Value: direct,
 		}, len(direct), nil
 	}
 	if inDirect, ok := t.isInDirect(currStr); ok {
 		return Token{
-			Typ:   Indirect,
+			Type:  Indirect,
 			Value: inDirect,
 		}, len(inDirect), nil
 	}
 	if inDirect, ok := t.isInDirectLabel(currStr); ok {
 		return Token{
-			Typ:   IndirectLabel,
+			Type:  IndirectLabel,
 			Value: inDirect,
 		}, len(inDirect), nil
 	}

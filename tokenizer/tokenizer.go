@@ -5,8 +5,10 @@ import (
 )
 
 type Token struct {
-	Typ   TokenType
-	Value interface{}
+	Type      TokenType
+	Value     interface{}
+	PosLine   int
+	PosColumn int
 }
 
 type Tokenizer struct {
@@ -20,7 +22,7 @@ type Tokenizer struct {
 
 func (t *Tokenizer) Print() {
 	for _, t := range t.tokens {
-		fmt.Printf("<%s:%s>\n", t.Value, t.Typ)
+		fmt.Printf("<%s:%s>\n", t.Value, t.Type)
 	}
 }
 
@@ -33,16 +35,18 @@ func (t *Tokenizer) Tokenize() error {
 		token, ln, err := t.getTokenType()
 		if err != nil {
 			return fmt.Errorf("met unsupported token starting at line: %d, pos: %d (symbol:%c)",
-				t.currLine+1, t.currPosInLine+1, t.currChar())
+				t.currLine, t.currPosInLine, t.currChar())
 		}
-		if token.Typ != Space {
+		if token.Type != Space {
+			token.PosLine = t.currLine
+			token.PosColumn = t.currPosInLine
 			t.tokens = append(t.tokens, token)
 		}
 		t.currIdx += ln
 		t.currPosInLine += ln
-		if token.Typ == LineBreak {
+		if token.Type == LineBreak {
 			t.currLine++
-			t.currPosInLine = 0
+			t.currPosInLine = 1
 		}
 	}
 	return nil
@@ -54,10 +58,10 @@ func (t *Tokenizer) GetNextToken() Token {
 		t.currToken++
 		return tok
 	}
-	return Token{Typ: EOF, Value: ""}
+	return Token{Type: EOF, Value: "", PosLine: t.tokens[len(t.tokens)-1].PosLine + 1}
 
 }
 
 func NewTokenizer(inp string) Tokenizer {
-	return Tokenizer{input: inp}
+	return Tokenizer{input: inp, currLine: 1}
 }

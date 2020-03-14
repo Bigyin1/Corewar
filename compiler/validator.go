@@ -12,16 +12,16 @@ type InstructionsValidator struct {
 
 func (v InstructionsValidator) getExpectedArgTypes(expArgCodes uint8) string {
 	res := ""
-	if expArgCodes&tokenizer.T_REG_CODE != 0 {
+	if expArgCodes&tokenizer.T_REG_ID_CODE != 0 {
 		res += tokenizer.T_REG.ArgTypeName
 	}
-	if expArgCodes&tokenizer.T_DIR_CODE != 0 {
+	if expArgCodes&tokenizer.T_DIR_ID_CODE != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
 		res += tokenizer.T_DIR.ArgTypeName
 	}
-	if expArgCodes&tokenizer.T_IND_CODE != 0 {
+	if expArgCodes&tokenizer.T_IND_ID_CODE != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
@@ -32,16 +32,17 @@ func (v InstructionsValidator) getExpectedArgTypes(expArgCodes uint8) string {
 
 func (v InstructionsValidator) validateInstruction(cmd *parser.InstructionNode) bool {
 	currCmdArgs := cmd.Args
-	cmdExpArgs := tokenizer.Instructions[cmd.InstructionName]
+	cmdExpArgs := cmd.Meta.AllowedArgs
 	if len(currCmdArgs) != len(cmdExpArgs) {
-		fmt.Printf("invalid args count for instruction %s", cmd.InstructionName)
+		fmt.Printf("invalid args count for instruction %s", cmd.Name)
 		return false
 	}
 	for idx, expArgCodes := range cmdExpArgs {
 		currArgType := currCmdArgs[idx].Type
-		if expArgCodes&currArgType.ArgTypeCode == 0 {
-			fmt.Printf("invalid arg type %s for cmd %s, expected %s",
-				currArgType.ArgTypeName, cmd.InstructionName, v.getExpectedArgTypes(expArgCodes))
+		if expArgCodes&currArgType.ArgTypeIDCode == 0 {
+			fmt.Printf("invalid arg type %s for cmd %s, expected %s; line: %d, col:%d",
+				currArgType.ArgTypeName, cmd.Name, v.getExpectedArgTypes(expArgCodes),
+				cmd.Token.PosLine, cmd.Token.PosColumn)
 			return false
 		}
 	}
@@ -50,9 +51,11 @@ func (v InstructionsValidator) validateInstruction(cmd *parser.InstructionNode) 
 
 func (v InstructionsValidator) ValidateInstructions() bool {
 	for _, cmd := range v.ast.Code.Commands {
-		isValid := v.validateInstruction(cmd.Instruction)
-		if !isValid {
-			return false
+		if cmd.Instruction != nil {
+			isValid := v.validateInstruction(cmd.Instruction)
+			if !isValid {
+				return false
+			}
 		}
 	}
 	return true
