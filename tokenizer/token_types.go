@@ -1,5 +1,7 @@
 package tokenizer
 
+import "calculator_ast/consts"
+
 type TokenType string
 
 func (tt TokenType) IsOfArgType() bool {
@@ -30,23 +32,23 @@ func (tt TokenType) IsRegisterArgType() bool {
 	return false
 }
 
-func (tt TokenType) GetArgType() ArgumentType {
+func (tt TokenType) GetArgType() consts.ArgumentType {
 	if tt == Register {
-		return T_REG
+		return consts.T_REG
 	}
 	if tt == Direct {
-		return T_DIR
+		return consts.T_DIR
 	}
 	if tt == DirectLabel {
-		return T_DIR
+		return consts.T_DIR
 	}
 	if tt == Indirect {
-		return T_IND
+		return consts.T_IND
 	}
 	if tt == IndirectLabel {
-		return T_IND
+		return consts.T_IND
 	}
-	return ArgumentType{}
+	return consts.ArgumentType{}
 }
 
 const (

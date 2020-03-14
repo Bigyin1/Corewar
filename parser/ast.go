@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"calculator_ast/consts"
 	"calculator_ast/tokenizer"
 )
 
@@ -27,8 +28,8 @@ type LabelNode struct {
 
 type InstructionNode struct {
 	Token       tokenizer.Token
-	Name        tokenizer.InstructionName
-	Meta        tokenizer.InstructionMeta
+	Name        consts.InstructionName
+	Meta        consts.InstructionMeta
 	Args        []InstructionArgument
 	OffsetBytes int
 	Size        int // for debug, not used in logic
@@ -36,6 +37,6 @@ type InstructionNode struct {
 
 type InstructionArgument struct {
 	Token tokenizer.Token
-	Type  tokenizer.ArgumentType
+	Type  consts.ArgumentType
 	Value interface{}
 }

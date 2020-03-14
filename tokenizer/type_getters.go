@@ -1,6 +1,7 @@
 package tokenizer
 
 import (
+	"calculator_ast/consts"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ func (t *Tokenizer) isLabel(currStr string) (string, bool) {
 			hasTerminate = true
 			break
 		}
-		if !strings.Contains(LabelChars, string(currStr[idx])) {
+		if !strings.Contains(consts.LabelChars, string(currStr[idx])) {
 			return "", false
 		}
 		label.WriteByte(currStr[idx])
@@ -42,9 +43,9 @@ func (t *Tokenizer) isString(currStr string) (string, bool) {
 	return "", false
 }
 
-func (t *Tokenizer) isInstruction(currStr string) (InstructionName, bool) {
-	currInstr := InstructionName("")
-	for instrName := range InstructionsConfig {
+func (t *Tokenizer) isInstruction(currStr string) (consts.InstructionName, bool) {
+	currInstr := consts.InstructionName("")
+	for instrName := range consts.InstructionsConfig {
 		if strings.HasPrefix(currStr, string(instrName)) && len(instrName) > len(currInstr) {
 			currInstr = instrName
 		}
@@ -74,7 +75,7 @@ func (t *Tokenizer) isRegister(currStr string) (RegisterTokenVal, bool) {
 	if err != nil {
 		return "", false
 	}
-	if n > RegNumber || n == 0 {
+	if n > consts.RegNumber || n == 0 {
 		return "", false
 	}
 	res.WriteString(num.String())
@@ -82,8 +83,8 @@ func (t *Tokenizer) isRegister(currStr string) (RegisterTokenVal, bool) {
 }
 
 func (t *Tokenizer) isSeparator(currStr string) (string, bool) {
-	if strings.HasPrefix(currStr, SeparatorSymbol) {
-		return SeparatorSymbol, true
+	if strings.HasPrefix(currStr, consts.SeparatorSymbol) {
+		return consts.SeparatorSymbol, true
 	}
 	return "", false
 }
@@ -124,7 +125,7 @@ func (t *Tokenizer) isDirectLabel(currStr string) (DirectLabelTokenVal, bool) {
 	res.WriteByte(':')
 	labelStr := currStr[2:]
 	for i := range labelStr {
-		if !strings.Contains(LabelChars, string(labelStr[i])) {
+		if !strings.Contains(consts.LabelChars, string(labelStr[i])) {
 			if i == 0 {
 				return "", false
 			}
@@ -147,7 +148,7 @@ func (t *Tokenizer) isInDirectLabel(currStr string) (IndirectLabelTokenVal, bool
 	res.WriteByte(':')
 	labelStr := currStr[1:]
 	for i := range labelStr {
-		if !strings.Contains(LabelChars, string(labelStr[i])) {
+		if !strings.Contains(consts.LabelChars, string(labelStr[i])) {
 			if i == 0 {
 				return "", false
 			}
@@ -160,18 +161,18 @@ func (t *Tokenizer) isInDirectLabel(currStr string) (IndirectLabelTokenVal, bool
 
 func (t *Tokenizer) getTokenType() (Token, int, error) {
 	currStr := t.input[t.currIdx:]
-	if strings.HasPrefix(currStr, NameHeader) {
+	if strings.HasPrefix(currStr, consts.NameHeader) {
 		return Token{
 			Type:  ChampName,
-			Value: NameHeader,
-		}, len(NameHeader), nil
+			Value: consts.NameHeader,
+		}, len(consts.NameHeader), nil
 	}
 
-	if strings.HasPrefix(currStr, CommentHeader) {
+	if strings.HasPrefix(currStr, consts.CommentHeader) {
 		return Token{
 			Type:  ChampComment,
-			Value: CommentHeader,
-		}, len(CommentHeader), nil
+			Value: consts.CommentHeader,
+		}, len(consts.CommentHeader), nil
 	}
 	if strings.HasPrefix(currStr, " ") || strings.HasPrefix(currStr, "\t") {
 		return Token{

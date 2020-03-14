@@ -1,4 +1,4 @@
-package tokenizer
+package consts
 
 const NameHeader = ".name"
 const CommentHeader = ".comment"

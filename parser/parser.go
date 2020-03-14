@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"calculator_ast/consts"
 	"calculator_ast/tokenizer"
 	"fmt"
 )
@@ -37,11 +38,11 @@ func (p *Parser) eatToken(tokenType tokenizer.TokenType) error {
 		p.currentToken.PosLine, p.currentToken.PosColumn)
 }
 
-func (p *Parser) argument(instrName tokenizer.InstructionName) InstructionArgument {
+func (p *Parser) argument(instrName consts.InstructionName) InstructionArgument {
 	argType := p.currentToken.Type.GetArgType()
 	arg := InstructionArgument{Token: p.currentToken, Type: argType}
 	if p.currentToken.Type.IsDirectArgType() {
-		arg.Type.Size = tokenizer.InstructionsConfig[instrName].TDirSize // set alternative dir size
+		arg.Type.Size = consts.InstructionsConfig[instrName].TDirSize // set alternative dir size
 	}
 	_ = p.eatToken(p.currentToken.Type)
 	return arg
@@ -49,9 +50,9 @@ func (p *Parser) argument(instrName tokenizer.InstructionName) InstructionArgume
 
 func (p *Parser) instruction() (InstructionNode, error) {
 	instrNode := InstructionNode{}
-	instrNode.Name = p.currentToken.Value.(tokenizer.InstructionName)
+	instrNode.Name = p.currentToken.Value.(consts.InstructionName)
 	instrNode.Token = p.currentToken
-	instrNode.Meta = tokenizer.InstructionsConfig[instrNode.Name]
+	instrNode.Meta = consts.InstructionsConfig[instrNode.Name]
 	err := p.eatToken(tokenizer.Instr)
 	if err != nil {
 		return InstructionNode{}, err

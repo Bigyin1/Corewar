@@ -1,8 +1,8 @@
 package compiler
 
 import (
+	"calculator_ast/consts"
 	"calculator_ast/parser"
-	"calculator_ast/tokenizer"
 	"fmt"
 )
 
@@ -12,20 +12,20 @@ type InstructionsValidator struct {
 
 func (v InstructionsValidator) getExpectedArgTypes(expArgCodes uint8) string {
 	res := ""
-	if expArgCodes&tokenizer.T_REG_ID_CODE != 0 {
-		res += tokenizer.T_REG.ArgTypeName
+	if expArgCodes&consts.T_REG_ID_CODE != 0 {
+		res += consts.T_REG.ArgTypeName
 	}
-	if expArgCodes&tokenizer.T_DIR_ID_CODE != 0 {
+	if expArgCodes&consts.T_DIR_ID_CODE != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += tokenizer.T_DIR.ArgTypeName
+		res += consts.T_DIR.ArgTypeName
 	}
-	if expArgCodes&tokenizer.T_IND_ID_CODE != 0 {
+	if expArgCodes&consts.T_IND_ID_CODE != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += tokenizer.T_IND.ArgTypeName
+		res += consts.T_IND.ArgTypeName
 	}
 	return res
 }
