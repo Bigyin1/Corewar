@@ -34,19 +34,19 @@ func (tt TokenType) IsRegisterArgType() bool {
 
 func (tt TokenType) GetArgType() consts.ArgumentType {
 	if tt == Register {
-		return consts.T_REG
+		return consts.TReg
 	}
 	if tt == Direct {
-		return consts.T_DIR
+		return consts.TDir
 	}
 	if tt == DirectLabel {
-		return consts.T_DIR
+		return consts.TDir
 	}
 	if tt == Indirect {
-		return consts.T_IND
+		return consts.TInd
 	}
 	if tt == IndirectLabel {
-		return consts.T_IND
+		return consts.TInd
 	}
 	return consts.ArgumentType{}
 }

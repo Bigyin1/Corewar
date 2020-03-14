@@ -34,7 +34,7 @@ func (c Compiler) FillArgValues() error {
 			case tokenizer.Direct:
 				val := arg.Token.Value.(tokenizer.DirectTokenVal).GetValue()
 				arg.Value = val
-				if arg.Type.Size == consts.SHORT_DIR_SIZE {
+				if arg.Type.Size == consts.ShortDirSize {
 					arg.Value = int16(val)
 				}
 			case tokenizer.DirectLabel:
@@ -44,7 +44,7 @@ func (c Compiler) FillArgValues() error {
 					return fmt.Errorf("failed to find %s label, line: %d", label, cmd.Instruction.Token.PosLine)
 				}
 				arg.Value = labelOffset - cmdOffset
-				if arg.Type.Size == consts.SHORT_DIR_SIZE {
+				if arg.Type.Size == consts.ShortDirSize {
 					arg.Value = int16(labelOffset - cmdOffset)
 				}
 			case tokenizer.Indirect:

@@ -12,20 +12,20 @@ type InstructionsValidator struct {
 
 func (v InstructionsValidator) getExpectedArgTypes(expArgCodes uint8) string {
 	res := ""
-	if expArgCodes&consts.T_REG_ID_CODE != 0 {
-		res += consts.T_REG.ArgTypeName
+	if expArgCodes&consts.TRegIdCode != 0 {
+		res += consts.TReg.ArgTypeName
 	}
-	if expArgCodes&consts.T_DIR_ID_CODE != 0 {
+	if expArgCodes&consts.TDirIdCode != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += consts.T_DIR.ArgTypeName
+		res += consts.TDir.ArgTypeName
 	}
-	if expArgCodes&consts.T_IND_ID_CODE != 0 {
+	if expArgCodes&consts.TIndIdCode != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += consts.T_IND.ArgTypeName
+		res += consts.TInd.ArgTypeName
 	}
 	return res
 }
