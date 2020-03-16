@@ -4,68 +4,70 @@ import (
 	"calculator_ast/compiler"
 	"calculator_ast/parser"
 	"calculator_ast/tokenizer"
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"strings"
 )
 
-func evaluate(input string) string {
+func compile(input string) (*compiler.Compiler, error) {
 	lex := tokenizer.NewTokenizer(input)
 	err := lex.Tokenize()
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return nil, err
 	}
-	lex.Print()
 
 	pars := parser.NewParser(lex)
-	res, err := pars.Parse()
+	ast, err := pars.Parse()
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return nil, err
 	}
-	instrValidator := compiler.NewInstructionsValidator(res)
-	instrValidator.ValidateInstructions()
-	off := compiler.NewInstructionOffsetIndexer(res)
-	off.SetOffsets()
-	c := compiler.NewCompiler(res)
-	err = c.SetupLabelsTable()
+	comp := compiler.NewCompiler(ast)
+	err = comp.Compile()
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return nil, err
 	}
-	err = c.FillArgValues()
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	//code := c.GetByteCode()
-	c.PrintAnnotatedCode()
-	//for _, b := range code {
-	//	fmt.Printf("%02x ", b)
-	//}
-	return ""
+	return &comp, nil
 }
 
 func main() {
-	if len(os.Args) == 2 {
-		file := os.Args[1]
-		input, err := ioutil.ReadFile(file)
+	var printDebug bool
+	flag.BoolVar(&printDebug, "d", false, "print annotated result code")
+	flag.Parse()
+	if len(flag.Args()) == 1 {
+		inputFile := flag.Arg(0)
+		if !strings.HasSuffix(inputFile, ".asm") && !strings.HasSuffix(inputFile, ".s") {
+			fmt.Println("accept files .s or .asm")
+			return
+		}
+		input, err := ioutil.ReadFile(inputFile)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		res := evaluate(string(input))
-		fmt.Println(res)
+		comp, err := compile(string(input))
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
+		if printDebug {
+			comp.PrintAnnotatedCode()
+			return
+		}
+		outfile := ""
+		if strings.HasSuffix(inputFile, ".asm") {
+			outfile = strings.TrimSuffix(inputFile, ".asm")
+		}
+		if strings.HasSuffix(inputFile, ".s") {
+			outfile = strings.TrimSuffix(inputFile, ".s")
+		}
+		outfile += ".cor"
+		err = ioutil.WriteFile(outfile, comp.GetByteCode(), 0777)
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
 		return
 	}
-	file := ""
-	_, _ = fmt.Fscanf(os.Stdin, "%s", &file)
-	input, err := ioutil.ReadFile(file)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	res := evaluate(string(input))
-	fmt.Println(res)
+	fmt.Println("Usage: ./asm [-d] <sourcefile.s>")
 }
