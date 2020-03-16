@@ -74,6 +74,23 @@ func (c *Compiler) PrintAnnotatedCode() {
 
 }
 
+func (c Compiler) Compile() error {
+	err := c.validateInstructions()
+	if err != nil {
+		return err
+	}
+	c.setOffsets()
+	err = c.setupLabelsTable()
+	if err != nil {
+		return err
+	}
+	err = c.fillArgValues()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func NewCompiler(ast parser.ProgramNode) Compiler {
 	return Compiler{ast: ast, labelTable: make(map[string]int)}
 }

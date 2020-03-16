@@ -2,11 +2,7 @@ package compiler
 
 import "calculator_ast/parser"
 
-type InstructionOffsetIndexer struct {
-	ast parser.ProgramNode
-}
-
-func (ip InstructionOffsetIndexer) evalInstrSize(instr *parser.InstructionNode) int {
+func (c Compiler) evalInstrSize(instr *parser.InstructionNode) int {
 	size := 1
 	if instr.Meta.IsArgTypeCode {
 		size++
@@ -17,9 +13,9 @@ func (ip InstructionOffsetIndexer) evalInstrSize(instr *parser.InstructionNode) 
 	return size
 }
 
-func (ip InstructionOffsetIndexer) SetOffsets() {
+func (c Compiler) setOffsets() {
 	currOffset := 0
-	for _, cmd := range ip.ast.Code.Commands {
+	for _, cmd := range c.ast.Code.Commands {
 		if cmd.Instruction == nil {
 			for idx := range cmd.Labels {
 				cmd.Labels[idx].OffsetBytes = currOffset
@@ -30,12 +26,8 @@ func (ip InstructionOffsetIndexer) SetOffsets() {
 		for idx := range cmd.Labels {
 			cmd.Labels[idx].OffsetBytes = currOffset
 		}
-		instrSize := ip.evalInstrSize(cmd.Instruction)
+		instrSize := c.evalInstrSize(cmd.Instruction)
 		cmd.Instruction.Size = instrSize
 		currOffset += instrSize
 	}
-}
-
-func NewInstructionOffsetIndexer(ast parser.ProgramNode) InstructionOffsetIndexer {
-	return InstructionOffsetIndexer{ast: ast}
 }

@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func (c Compiler) SetupLabelsTable() error {
+func (c Compiler) setupLabelsTable() error {
 	for _, cmd := range c.ast.Code.Commands {
 		for _, label := range cmd.Labels {
 			_, ok := c.labelTable[label.Name]
@@ -20,7 +20,7 @@ func (c Compiler) SetupLabelsTable() error {
 	return nil
 }
 
-func (c Compiler) FillArgValues() error {
+func (c Compiler) fillArgValues() error {
 	for _, cmd := range c.ast.Code.Commands {
 		if cmd.Instruction == nil {
 			continue
