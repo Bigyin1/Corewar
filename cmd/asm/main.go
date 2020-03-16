@@ -1,9 +1,9 @@
 package main
 
 import (
-	"calculator_ast/compiler"
-	"calculator_ast/parser"
-	"calculator_ast/tokenizer"
+	"calculator_ast/pkg/asm/compiler"
+	"calculator_ast/pkg/asm/parser"
+	"calculator_ast/pkg/asm/tokenizer"
 	"flag"
 	"fmt"
 	"io/ioutil"

@@ -2,7 +2,7 @@ package compiler
 
 import (
 	"bytes"
-	"calculator_ast/parser"
+	"calculator_ast/pkg/asm/parser"
 	"encoding/binary"
 	"fmt"
 	"io"

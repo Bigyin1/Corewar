@@ -2,7 +2,7 @@ package parser
 
 import (
 	"calculator_ast/consts"
-	"calculator_ast/tokenizer"
+	"calculator_ast/pkg/asm/tokenizer"
 	"fmt"
 )
 

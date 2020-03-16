@@ -2,7 +2,7 @@ package compiler
 
 import (
 	"calculator_ast/consts"
-	"calculator_ast/parser"
+	"calculator_ast/pkg/asm/parser"
 	"fmt"
 )
 
