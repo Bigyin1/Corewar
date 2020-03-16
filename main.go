@@ -47,7 +47,7 @@ func main() {
 		}
 		comp, err := compile(string(input))
 		if err != nil {
-			fmt.Print(err)
+			fmt.Println(err)
 			return
 		}
 		if printDebug {
@@ -64,7 +64,7 @@ func main() {
 		outfile += ".cor"
 		err = ioutil.WriteFile(outfile, comp.GetByteCode(), 0777)
 		if err != nil {
-			fmt.Print(err)
+			fmt.Println(err)
 			return
 		}
 		return
