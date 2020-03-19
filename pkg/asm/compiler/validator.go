@@ -55,3 +55,10 @@ func (c Compiler) validateInstructions() error {
 	}
 	return nil
 }
+
+func (c Compiler) validateMeta() error {
+	if len(c.ast.ChampName) >= consts.ChampNameLength {
+		return fmt.Errorf("champion name length must be less than %d", consts.ChampNameLength)
+	}
+	return nil
+}

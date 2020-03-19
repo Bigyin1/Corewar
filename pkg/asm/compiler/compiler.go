@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"bytes"
+	"calculator_ast/consts"
 	"calculator_ast/pkg/asm/parser"
 	"encoding/binary"
 	"fmt"
@@ -31,8 +32,18 @@ func (c *Compiler) writeArgValue(r io.Writer, argVal interface{}) {
 	_ = binary.Write(r, binary.LittleEndian, argVal)
 }
 
+func (c *Compiler) getChampNameBytes(n []byte) {
+	for i, c := range c.ast.ChampName {
+		n[i] = byte(c)
+	}
+}
+
 func (c *Compiler) GetByteCode() []byte {
 	var code bytes.Buffer
+	nameBytes := make([]byte, consts.ChampNameLength)
+	c.getChampNameBytes(nameBytes)
+	code.Write(nameBytes)
+
 	for _, cmd := range c.ast.Code.Commands {
 		if cmd.Instruction == nil {
 			continue
@@ -51,6 +62,7 @@ func (c *Compiler) GetByteCode() []byte {
 
 func (c *Compiler) PrintAnnotatedCode() {
 	annotations := &strings.Builder{}
+	_, _ = fmt.Fprintf(annotations, "champion name: %s\n", c.ast.ChampName)
 	for _, cmd := range c.ast.Code.Commands {
 		if cmd.Instruction == nil {
 			continue
@@ -64,8 +76,7 @@ func (c *Compiler) PrintAnnotatedCode() {
 				c.getArgTypeCode(cmd.Instruction.Args))
 		}
 		for _, arg := range cmd.Instruction.Args {
-			argFormat := fmt.Sprintf("%%0x(%%v, %%v) ")
-			_, _ = fmt.Fprintf(annotations, argFormat,
+			_, _ = fmt.Fprintf(annotations, "%0x(%v, %v) ",
 				arg.Value, arg.Token.Value, arg.Value)
 		}
 		_, _ = fmt.Fprintf(annotations, "\n")
@@ -75,7 +86,11 @@ func (c *Compiler) PrintAnnotatedCode() {
 }
 
 func (c Compiler) Compile() error {
-	err := c.validateInstructions()
+	err := c.validateMeta()
+	if err != nil {
+		return err
+	}
+	err = c.validateInstructions()
 	if err != nil {
 		return err
 	}
