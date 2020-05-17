@@ -1,12 +1,13 @@
 package main
 
 import (
-	"calculator_ast/pkg/asm/compiler"
-	"calculator_ast/pkg/asm/parser"
-	"calculator_ast/pkg/asm/tokenizer"
+	"corewar/pkg/asm/compiler"
+	"corewar/pkg/asm/parser"
+	"corewar/pkg/asm/tokenizer"
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -70,4 +71,5 @@ func main() {
 		return
 	}
 	fmt.Println("Usage: ./asm [-d] <sourcefile.s>")
+	os.Exit(1)
 }

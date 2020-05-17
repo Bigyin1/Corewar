@@ -1,3 +1,3 @@
-module calculator_ast
+module corewar
 
 go 1.14

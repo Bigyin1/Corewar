@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"calculator_ast/consts"
-	"calculator_ast/pkg/asm/tokenizer"
+	"corewar/consts"
+	"corewar/pkg/asm/tokenizer"
 	"fmt"
 )
 

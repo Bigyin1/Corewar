@@ -1,6 +1,6 @@
 package tokenizer
 
-import "calculator_ast/consts"
+import "corewar/consts"
 
 type TokenType string
 

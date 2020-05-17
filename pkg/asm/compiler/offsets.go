@@ -1,6 +1,6 @@
 package compiler
 
-import "calculator_ast/pkg/asm/parser"
+import "corewar/pkg/asm/parser"
 
 func (c Compiler) evalInstrSize(instr *parser.InstructionNode) int {
 	size := 1
