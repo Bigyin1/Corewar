@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"corewar/consts"
 	"corewar/pkg/asm/parser"
+	"corewar/pkg/consts"
 	"fmt"
 )
 

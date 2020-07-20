@@ -1,6 +1,9 @@
 package tokenizer
 
-import "corewar/consts"
+import (
+	"corewar/pkg/consts"
+	"errors"
+)
 
 type TokenType string
 
@@ -50,6 +53,8 @@ func (tt TokenType) GetArgType() consts.ArgumentType {
 	}
 	return consts.ArgumentType{}
 }
+
+var EOFErr = errors.New("EOF")
 
 const (
 	Str           TokenType = "STRING"

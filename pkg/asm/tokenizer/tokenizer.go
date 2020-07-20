@@ -49,6 +49,7 @@ func (t *Tokenizer) Tokenize() error {
 			t.currPosInLine = 1
 		}
 	}
+	t.tokens = append(t.tokens)
 	return nil
 }
 

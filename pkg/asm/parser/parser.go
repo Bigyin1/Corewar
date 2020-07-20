@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"corewar/consts"
 	"corewar/pkg/asm/tokenizer"
+	"corewar/pkg/consts"
 	"fmt"
 )
 
@@ -30,6 +30,9 @@ func (p *Parser) eatSpaces() {
 }
 
 func (p *Parser) eatToken(tokenType tokenizer.TokenType) error {
+	if p.currentToken.Type == tokenizer.EOF {
+		return tokenizer.EOFErr
+	}
 	if p.currentToken.Type == tokenType {
 		p.currentToken = p.lexer.GetNextToken()
 		return nil
@@ -97,6 +100,9 @@ func (p *Parser) command() (CommandNode, error) {
 		}
 		cmdNode.Instruction = &instNode
 		err = p.eatToken(tokenizer.LineBreak)
+		if err == tokenizer.EOFErr {
+			return cmdNode, nil
+		}
 		if err != nil {
 			return CommandNode{}, err
 		}

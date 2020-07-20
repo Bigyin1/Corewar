@@ -1,7 +1,7 @@
 package tokenizer
 
 import (
-	"corewar/consts"
+	"corewar/pkg/consts"
 	"fmt"
 	"strconv"
 	"strings"

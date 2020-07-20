@@ -2,8 +2,8 @@ package compiler
 
 import (
 	"bytes"
-	"corewar/consts"
 	"corewar/pkg/asm/parser"
+	"corewar/pkg/consts"
 	"encoding/binary"
 	"fmt"
 	"io"
