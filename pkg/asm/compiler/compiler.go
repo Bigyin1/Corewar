@@ -29,21 +29,33 @@ func (c *Compiler) getArgTypeCode(args []parser.InstructionArgument) byte {
 }
 
 func (c *Compiler) writeArgValue(r io.Writer, argVal interface{}) {
-	_ = binary.Write(r, binary.LittleEndian, argVal)
+	_ = binary.Write(r, binary.BigEndian, argVal)
 }
 
-func (c *Compiler) getChampNameBytes(n []byte) {
-	for i, c := range c.ast.ChampName {
-		n[i] = byte(c)
+func (c *Compiler) writeMetaData(w *bytes.Buffer, codeLen uint64) {
+	w.Grow(len(consts.MagicHeader) + consts.ProgNameLength + len(consts.NullSeq))
+
+	w.WriteString(consts.MagicHeader)
+	w.WriteString(c.ast.ChampName)
+	for i := 0; i < consts.ProgNameLength-len(c.ast.ChampName); i++ {
+		w.WriteByte(0)
 	}
+
+	w.WriteString(consts.NullSeq)
+
+	_ = binary.Write(w, binary.BigEndian, codeLen)
+
+	w.WriteString(c.ast.ChampComment)
+	for i := 0; i < consts.CommentLength-len(c.ast.ChampComment); i++ {
+		w.WriteByte(0)
+	}
+
+	w.WriteString(consts.NullSeq)
 }
 
-func (c *Compiler) GetByteCode() []byte {
-	var code bytes.Buffer
-	nameBytes := make([]byte, consts.ChampNameLength)
-	c.getChampNameBytes(nameBytes)
-	code.Write(nameBytes)
+func (c *Compiler) GetByteCode() io.Reader {
 
+	var code bytes.Buffer
 	for _, cmd := range c.ast.Code.Commands {
 		if cmd.Instruction == nil {
 			continue
@@ -57,10 +69,14 @@ func (c *Compiler) GetByteCode() []byte {
 			c.writeArgValue(&code, arg.Value)
 		}
 	}
-	return code.Bytes()
+
+	var header bytes.Buffer
+	c.writeMetaData(&header, uint64(code.Len()))
+
+	return io.MultiReader(&header, &code)
 }
 
-func (c *Compiler) PrintAnnotatedCode() {
+func (c *Compiler) PrintAnnotatedCode(w io.Writer) {
 	annotations := &strings.Builder{}
 	_, _ = fmt.Fprintf(annotations, "champion name: %s\n", c.ast.ChampName)
 	for _, cmd := range c.ast.Code.Commands {
@@ -81,7 +97,7 @@ func (c *Compiler) PrintAnnotatedCode() {
 		}
 		_, _ = fmt.Fprintf(annotations, "\n")
 	}
-	fmt.Print(annotations.String())
+	_, _ = fmt.Fprint(w, annotations.String())
 
 }
 

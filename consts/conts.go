@@ -7,15 +7,16 @@ const LabelChars = "abcdefghijklmnopqrstuvwxyz_0123456789"
 const RegNumber = 16
 const SeparatorSymbol = ","
 
+const MagicHeader = "\x00\xea\x83\xf3"
+const NullSeq = "\x00\x00\x00\x00"
+
+const ProgNameLength = 128
+const CommentLength = 2048
+
 const RegSize = 1
 const ShortDirSize = 2
 const IndSize = 2
 const DirSize = 4
-
-//type RegType uint8
-//type IndType int16
-//type ShortDirType int16
-//type DirType int32
 
 type InstructionName string
 
@@ -47,9 +48,9 @@ type ArgumentType struct {
 
 // Type codes for internal usage, not for byte code
 const (
-	TRegIdCode = 0b001
-	TDirIdCode = 0b010
-	TIndIdCode = 0b100
+	TRegIdCode = 1 << 0
+	TDirIdCode = 1 << 1
+	TIndIdCode = 1 << 2
 )
 
 var (
@@ -60,32 +61,32 @@ var (
 
 type InstructionMeta struct {
 	AllowedArgs   []uint8
+	IsArgTypeCode bool
 	TDirSize      int
 	OpCode        byte
-	IsArgTypeCode bool
 }
 
 var InstructionsConfig = map[InstructionName]InstructionMeta{
-	LIVE: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: 4, OpCode: 0x01},
-	LD:   {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: 4, OpCode: 0x02},
-	ST:   {AllowedArgs: []uint8{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: 4, OpCode: 0x03},
-	ADD:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: 4, OpCode: 0x04},
-	SUB:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: 4, OpCode: 0x05},
+	LIVE: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x01},
+	LD:   {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x02},
+	ST:   {AllowedArgs: []uint8{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x03},
+	ADD:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x04},
+	SUB:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x05},
 	AND: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: 4, OpCode: 0x06},
+		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x06},
 	OR: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: 4, OpCode: 0x07},
+		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x07},
 	XOR: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: 4, OpCode: 0x08},
-	ZJMP: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: 2, OpCode: 0x09},
+		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x08},
+	ZJMP: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x09},
 	LDI: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: 2, OpCode: 0x0A},
+		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0A},
 	STI: {AllowedArgs: []uint8{TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode},
-		IsArgTypeCode: true, TDirSize: 2, OpCode: 0x0B},
-	FORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: 2, OpCode: 0x0C},
-	LLD:  {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: 4, OpCode: 0x0D},
+		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0B},
+	FORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0C},
+	LLD:  {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x0D},
 	LLDI: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: 2, OpCode: 0x0E},
-	LFORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: 2, OpCode: 0x0F},
-	AFF:   {AllowedArgs: []uint8{TRegIdCode}, IsArgTypeCode: false, TDirSize: 4, OpCode: 0x10},
+		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0E},
+	LFORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0F},
+	AFF:   {AllowedArgs: []uint8{TRegIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x10},
 }

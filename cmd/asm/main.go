@@ -6,6 +6,7 @@ import (
 	"corewar/pkg/asm/tokenizer"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -35,41 +36,47 @@ func main() {
 	var printDebug bool
 	flag.BoolVar(&printDebug, "d", false, "print annotated result code")
 	flag.Parse()
-	if len(flag.Args()) == 1 {
-		inputFile := flag.Arg(0)
-		if !strings.HasSuffix(inputFile, ".asm") && !strings.HasSuffix(inputFile, ".s") {
-			fmt.Println("accept files .s or .asm")
-			return
-		}
-		input, err := ioutil.ReadFile(inputFile)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		comp, err := compile(string(input))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		if printDebug {
-			comp.PrintAnnotatedCode()
-			return
-		}
-		outfile := ""
-		if strings.HasSuffix(inputFile, ".asm") {
-			outfile = strings.TrimSuffix(inputFile, ".asm")
-		}
-		if strings.HasSuffix(inputFile, ".s") {
-			outfile = strings.TrimSuffix(inputFile, ".s")
-		}
-		outfile += ".cor"
-		err = ioutil.WriteFile(outfile, comp.GetByteCode(), 0777)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	if len(flag.Args()) != 1 {
+		fmt.Println("Usage: ./asm [-d] <sourcefile.s>")
+		os.Exit(1)
+	}
+	inputFile := flag.Arg(0)
+	if !strings.HasSuffix(inputFile, ".asm") && !strings.HasSuffix(inputFile, ".s") {
+		fmt.Println("accept files .s or .asm")
 		return
 	}
-	fmt.Println("Usage: ./asm [-d] <sourcefile.s>")
-	os.Exit(1)
+	input, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	comp, err := compile(string(input))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if printDebug {
+		comp.PrintAnnotatedCode(os.Stderr)
+		return
+	}
+	var outfile string
+	if strings.HasSuffix(inputFile, ".asm") {
+		outfile = strings.TrimSuffix(inputFile, ".asm")
+	}
+	if strings.HasSuffix(inputFile, ".s") {
+		outfile = strings.TrimSuffix(inputFile, ".s")
+	}
+	outfile += ".cor"
+	f, err := os.OpenFile(outfile, os.O_WRONLY, 0777)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+	_, err = io.Copy(f, comp.GetByteCode())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	return
 }

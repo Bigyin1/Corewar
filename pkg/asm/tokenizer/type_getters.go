@@ -183,7 +183,7 @@ func (t *Tokenizer) getTokenType() (Token, int, error) {
 	if strings.HasPrefix(currStr, "\n") {
 		return Token{
 			Type:  LineBreak,
-			Value: BreakLineTokenVal("\n"),
+			Value: "\n",
 		}, 1, nil
 	}
 	if strings.HasPrefix(currStr, "+") {

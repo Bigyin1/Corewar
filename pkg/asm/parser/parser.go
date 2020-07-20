@@ -49,7 +49,7 @@ func (p *Parser) argument(instrName consts.InstructionName) InstructionArgument 
 }
 
 func (p *Parser) instruction() (InstructionNode, error) {
-	instrNode := InstructionNode{}
+	var instrNode InstructionNode
 	instrNode.Name = p.currentToken.Value.(consts.InstructionName)
 	instrNode.Token = p.currentToken
 	instrNode.Meta = consts.InstructionsConfig[instrNode.Name]

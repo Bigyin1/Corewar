@@ -11,12 +11,6 @@ func (v RegisterTokenVal) GetValue() uint8 {
 	return uint8(rnum)
 }
 
-type BreakLineTokenVal string
-
-func (v BreakLineTokenVal) String() string {
-	return "\\n"
-}
-
 type DirectTokenVal string
 
 func (v DirectTokenVal) GetValue() int32 {
