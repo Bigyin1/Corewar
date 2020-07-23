@@ -32,7 +32,7 @@ func (c *Compiler) writeArgValue(r io.Writer, argVal interface{}) {
 	_ = binary.Write(r, binary.BigEndian, argVal)
 }
 
-func (c *Compiler) writeMetaData(w *bytes.Buffer, codeLen uint64) {
+func (c *Compiler) writeMetaData(w *bytes.Buffer, codeLen uint32) {
 	w.Grow(len(consts.MagicHeader) + consts.ProgNameLength + len(consts.NullSeq))
 
 	w.WriteString(consts.MagicHeader)
@@ -71,7 +71,7 @@ func (c *Compiler) GetByteCode() io.Reader {
 	}
 
 	var header bytes.Buffer
-	c.writeMetaData(&header, uint64(code.Len()))
+	c.writeMetaData(&header, uint32(code.Len()))
 
 	return io.MultiReader(&header, &code)
 }
