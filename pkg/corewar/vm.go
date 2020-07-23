@@ -23,3 +23,10 @@ type VM struct {
 	checksPassed int
 	started      bool
 }
+
+func (vm *VM) Step() {
+	if !vm.started {
+		return
+	}
+
+}

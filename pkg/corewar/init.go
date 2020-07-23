@@ -33,7 +33,7 @@ func (vm *VM) Start(pd ...PlayerData) error {
 		return err
 	}
 	vm.initProcs()
-
+	vm.started = true
 	return nil
 }
 
@@ -92,6 +92,7 @@ func parseHeader(d io.Reader, id int) (player, error) {
 	if int(h.CodeSize) > consts.ChampMaxSize {
 		return player{}, fmt.Errorf("player %d, has too long code (%d)", id, int(h.CodeSize))
 	}
+	p.size = int(h.CodeSize)
 	p.comment = string(bytes.Split(h.Comment[:], []byte{0})[0])
 	if string(h.Null2[:]) != consts.NullSeq {
 		return player{}, fmt.Errorf("player %d, has invalid code format", id)

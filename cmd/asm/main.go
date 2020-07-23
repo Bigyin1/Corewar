@@ -67,7 +67,7 @@ func main() {
 		outfile = strings.TrimSuffix(inputFile, ".s")
 	}
 	outfile += ".cor"
-	f, err := os.OpenFile(outfile, os.O_WRONLY|os.O_TRUNC, 0777)
+	f, err := os.OpenFile(outfile, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0777)
 	if err != nil {
 		fmt.Println(err)
 		return

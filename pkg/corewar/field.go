@@ -1,5 +1,7 @@
 package corewar
 
+import "io"
+
 type field struct {
 	m []byte
 }
@@ -34,4 +36,8 @@ func (f *field) StoreAt(idx int, d []byte) {
 
 	c := copy(f.m[idx:], d)
 	copy(f.m[0:], d[c:])
+}
+
+func (f *field) Dump(w io.Writer) {
+
 }
