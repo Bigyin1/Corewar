@@ -13,7 +13,9 @@ const NullSeq = "\x00\x00\x00\x00"
 const ProgNameLength = 128
 const CommentLength = 2048
 
-const RegSize = 1
+const RegSize = 4
+
+const RegArgSize = 1
 const ShortDirSize = 2
 const IndSize = 2
 const DirSize = 4
@@ -46,6 +48,8 @@ type ArgumentType struct {
 	Size          int
 }
 
+type TypeID uint8
+
 // Type codes for internal usage, not for byte code
 const (
 	TRegIdCode = 1 << 0
@@ -55,7 +59,7 @@ const (
 
 var (
 	TDir = ArgumentType{TDirIdCode, "T_DIR", 0b10, DirSize}
-	TReg = ArgumentType{TRegIdCode, "T_REG", 0b01, RegSize}
+	TReg = ArgumentType{TRegIdCode, "T_REG", 0b01, RegArgSize}
 	TInd = ArgumentType{TIndIdCode, "T_IND", 0b11, IndSize}
 )
 
@@ -64,14 +68,17 @@ type InstructionMeta struct {
 	IsArgTypeCode bool
 	TDirSize      int
 	OpCode        byte
+	CyclesToExec  int
+	IdxMod        bool
 }
 
 var InstructionsConfig = map[InstructionName]InstructionMeta{
-	LIVE: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x01},
-	LD:   {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x02},
-	ST:   {AllowedArgs: []uint8{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x03},
-	ADD:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x04},
-	SUB:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x05},
+	LIVE: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x01, CyclesToExec: 10},
+	LD: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x02,
+		CyclesToExec: 5},
+	ST:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x03},
+	ADD: {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x04},
+	SUB: {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x05},
 	AND: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x06},
 	OR: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},

@@ -5,4 +5,5 @@ const (
 	CyclesToDie  = 1536
 	MaxPlayers   = 4
 	ChampMaxSize = MemSize / 6
+	IdxMod       = MemSize / 8
 )

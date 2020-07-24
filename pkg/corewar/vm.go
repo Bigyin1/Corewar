@@ -17,6 +17,7 @@ type VM struct {
 	players      []player
 	lastAlive    *player
 	procs        procList
+	field        *field
 	cyclesPassed int
 	liveOps      int
 	cyclesToDie  int
@@ -24,7 +25,7 @@ type VM struct {
 	started      bool
 }
 
-func (vm *VM) Step() {
+func (vm *VM) Cycle() {
 	if !vm.started {
 		return
 	}

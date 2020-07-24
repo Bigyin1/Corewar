@@ -121,15 +121,15 @@ func (vm *VM) loadPlayersMeta(pd []PlayerData) error {
 }
 
 func (vm *VM) initProcs() {
-	f := newField(consts.MemSize)
+	vm.field = newField(consts.MemSize)
 
 	var procID int
 	var idx int
 	var idxStep = consts.MemSize / len(vm.players)
 
 	for i := range vm.players {
-		f.PutCodeAt(idx, vm.players[i].code)
-		vm.procs.Put(newProc(procID, vm.players[i].id, idx, f))
+		vm.field.PutCodeAt(idx, vm.players[i].code)
+		vm.procs.Put(newProc(procID, vm.players[i].id, idx, vm))
 
 		vm.players[i].code = nil // deallocate
 		procID++

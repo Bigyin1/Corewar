@@ -1,6 +1,9 @@
 package corewar
 
-import "io"
+import (
+	"bytes"
+	"encoding/binary"
+)
 
 type field struct {
 	m []byte
@@ -38,6 +41,16 @@ func (f *field) StoreAt(idx int, d []byte) {
 	copy(f.m[0:], d[c:])
 }
 
-func (f *field) Dump(w io.Writer) {
+func (f *field) GetInt32(idx int) (v int32) {
+	var buf [4]byte
+	f.LoadFrom(idx, buf[:])
+	_ = binary.Read(bytes.NewReader(buf[:]), binary.BigEndian, &v)
+	return
+}
 
+func (f *field) PutInt32(idx int, val int32) {
+	var buf [4]byte
+	binary.BigEndian.PutUint32(buf[:], uint32(val))
+	f.StoreAt(idx, buf[:])
+	return
 }
