@@ -9,8 +9,6 @@ ASM_SRC_FILES = $(foreach i,$(ASM_SRC_DIRS),$(shell find $(i) -name "*.go" -not 
 .PHONY: as
 as:
 	go build -o as cmd/asm/main.go
-
-
 #tests
 TEST_VM_DIR=pkg/corewar/testdata
 
@@ -20,7 +18,5 @@ CORFILES = $(ASMTESTFILES:.asm=.cor)
 .PHONY: corewar-test
 corewar-test: as $(CORFILES)
 	go test ./pkg/corewar
-
-
 %.cor: %.asm
 	./as $<
