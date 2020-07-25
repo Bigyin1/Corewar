@@ -19,7 +19,7 @@ func (f *field) PutCodeAt(idx int, code []byte) {
 	copy(f.m[idx:], code)
 }
 
-func (f *field) LoadFrom(idx int, d []byte) {
+func (f *field) loadFrom(idx int, d []byte) {
 	idx %= len(f.m)
 	if idx+len(d) <= len(f.m) {
 		copy(d, f.m[idx:])
@@ -29,7 +29,7 @@ func (f *field) LoadFrom(idx int, d []byte) {
 	copy(d[c:], f.m[0:])
 }
 
-func (f *field) StoreAt(idx int, d []byte) {
+func (f *field) storeAt(idx int, d []byte) {
 	idx %= len(f.m)
 
 	if idx+len(d) <= len(f.m) {
@@ -41,16 +41,17 @@ func (f *field) StoreAt(idx int, d []byte) {
 	copy(f.m[0:], d[c:])
 }
 
-func (f *field) GetInt32(idx int) (v int32) {
+func (f *field) GetInt32(idx int) int {
+	var res int32
 	var buf [4]byte
-	f.LoadFrom(idx, buf[:])
-	_ = binary.Read(bytes.NewReader(buf[:]), binary.BigEndian, &v)
-	return
+	f.loadFrom(idx, buf[:])
+	_ = binary.Read(bytes.NewReader(buf[:]), binary.BigEndian, &res)
+	return int(res)
 }
 
-func (f *field) PutInt32(idx int, val int32) {
+func (f *field) PutInt32(idx int, val int) {
 	var buf [4]byte
 	binary.BigEndian.PutUint32(buf[:], uint32(val))
-	f.StoreAt(idx, buf[:])
+	f.storeAt(idx, buf[:])
 	return
 }

@@ -10,11 +10,11 @@ func TestVMField(t *testing.T) {
 	f := newField(sz)
 
 	tests := []struct {
-		idx      int
-		val      []byte
-		int32Val int32
+		idx    int
+		val    []byte
+		intVal int
 	}{
-		{idx: 0, val: []byte{0x0, 0x0, 0xff, 0xff}, int32Val: -32},
+		{idx: 0, val: []byte{0x0, 0x0, 0xff, 0xff}, intVal: -32},
 		{idx: sz, val: []byte{0xff, 0xff}},
 		{idx: sz + sz, val: []byte{0x0, 0xff, 0xff}},
 		{idx: sz / 2, val: []byte{0xff, 0xff, 0x0}},
@@ -25,15 +25,15 @@ func TestVMField(t *testing.T) {
 		rb := make([]byte, len(tests[i].val))
 		wb := tests[i].val
 
-		f.StoreAt(tests[i].idx, wb)
-		f.LoadFrom(tests[i].idx, rb)
+		f.storeAt(tests[i].idx, wb)
+		f.loadFrom(tests[i].idx, rb)
 		if !bytes.Equal(wb, rb) {
-			t.Errorf("stored and loaded bytes are not equal")
+			t.Errorf("stored And loaded bytes are not equal")
 			return
 		}
-		f.PutInt32(tests[i].idx, tests[i].int32Val)
-		if f.GetInt32(tests[i].idx) != tests[i].int32Val {
-			t.Errorf("stored and loaded int32 are not equal")
+		f.PutInt32(tests[i].idx, tests[i].intVal)
+		if f.GetInt32(tests[i].idx) != tests[i].intVal {
+			t.Errorf("stored And loaded int32 are not equal")
 		}
 	}
 }
