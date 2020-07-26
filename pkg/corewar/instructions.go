@@ -152,7 +152,7 @@ func (p *proc) Fork(args ...arg) {
 	p.copy(pc % consts.IdxMod)
 }
 
-func (p *proc) lld(args ...arg) {
+func (p *proc) Lld(args ...arg) {
 	defer func() {
 		p.execLeft = p.cmdMeta.CyclesToExec
 	}()

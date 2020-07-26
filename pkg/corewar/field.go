@@ -50,8 +50,8 @@ func (f *field) GetInt32(idx int) int {
 }
 
 func (f *field) PutInt32(idx int, val int) {
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], uint32(val))
-	f.storeAt(idx, buf[:])
+	var buf = bytes.NewBuffer(make([]byte, 0, 4))
+	_ = binary.Write(buf, binary.BigEndian, int32(val))
+	f.storeAt(idx, buf.Bytes())
 	return
 }
