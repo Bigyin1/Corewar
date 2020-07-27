@@ -62,38 +62,3 @@ var (
 	TReg = ArgumentType{TRegIdCode, "T_REG", 0b01, RegArgSize}
 	TInd = ArgumentType{TIndIdCode, "T_IND", 0b11, IndSize}
 )
-
-type InstructionMeta struct {
-	AllowedArgs   []uint8
-	IsArgTypeCode bool
-	TDirSize      int
-	OpCode        byte
-	CyclesToExec  int
-	IdxMod        bool
-}
-
-var InstructionsConfig = map[InstructionName]InstructionMeta{
-	LIVE: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x01, CyclesToExec: 10},
-	LD: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x02,
-		CyclesToExec: 5},
-	ST:  {AllowedArgs: []uint8{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x03},
-	ADD: {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x04},
-	SUB: {AllowedArgs: []uint8{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x05},
-	AND: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x06},
-	OR: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x07},
-	XOR: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x08},
-	ZJMP: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x09},
-	LDI: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0A},
-	STI: {AllowedArgs: []uint8{TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode},
-		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0B},
-	FORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0C},
-	LLD:  {AllowedArgs: []uint8{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirSize, OpCode: 0x0D},
-	LLDI: {AllowedArgs: []uint8{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
-		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0E},
-	LFORK: {AllowedArgs: []uint8{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0F},
-	AFF:   {AllowedArgs: []uint8{TRegIdCode}, IsArgTypeCode: false, TDirSize: DirSize, OpCode: 0x10},
-}

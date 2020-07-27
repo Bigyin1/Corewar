@@ -98,16 +98,16 @@ func (tvm *testVM) testST(t *testing.T) {
 	argReg2 := arg{consts.TRegIdCode, 2}
 
 	memVal := 983
-	tvm.p.storeInReg(argReg1.val, memVal)
+	tvm.p.storeReg(argReg1.val, memVal)
 	tvm.p.St(argReg1, argReg2)
-	if tvm.p.loadFromReg(argReg2.val) != memVal {
+	if tvm.p.loadReg(argReg2.val) != memVal {
 		t.Errorf("two registers")
 	}
 
 	memVal = -8733
 	argReg := arg{consts.TRegIdCode, 1}
 	argInd := arg{consts.TIndIdCode, len(tvm.vm.field.m) + consts.IdxMod}
-	tvm.p.storeInReg(argReg1.val, memVal)
+	tvm.p.storeReg(argReg1.val, memVal)
 	tvm.p.St(argReg, argInd)
 	if tvm.vm.field.GetInt32(argInd.val%consts.IdxMod) != memVal {
 		t.Errorf("indirect")
@@ -124,10 +124,10 @@ func (tvm *testVM) testAdd(t *testing.T) {
 
 	memVal1 := 983
 	memVal2 := -62
-	tvm.p.storeInReg(argReg1.val, memVal1)
-	tvm.p.storeInReg(argReg2.val, memVal2)
+	tvm.p.storeReg(argReg1.val, memVal1)
+	tvm.p.storeReg(argReg2.val, memVal2)
 	tvm.p.Add(argReg1, argReg2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != memVal1+memVal2 {
+	if tvm.p.loadReg(argReg3.val) != memVal1+memVal2 {
 		t.Errorf("wrong sum")
 	}
 	*tvm = *newTestVM()
@@ -141,10 +141,10 @@ func (tvm *testVM) testSub(t *testing.T) {
 
 	memVal1 := 983
 	memVal2 := -62
-	tvm.p.storeInReg(argReg1.val, memVal1)
-	tvm.p.storeInReg(argReg2.val, memVal2)
+	tvm.p.storeReg(argReg1.val, memVal1)
+	tvm.p.storeReg(argReg2.val, memVal2)
 	tvm.p.Sub(argReg1, argReg2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != memVal1-memVal2 {
+	if tvm.p.loadReg(argReg3.val) != memVal1-memVal2 {
 		t.Errorf("wrong Sub")
 	}
 	*tvm = *newTestVM()
@@ -158,10 +158,10 @@ func (tvm *testVM) testAnd(t *testing.T) {
 
 	memVal1 := 983
 	memVal2 := -62
-	tvm.p.storeInReg(argReg1.val, memVal1)
-	tvm.p.storeInReg(argReg2.val, memVal2)
+	tvm.p.storeReg(argReg1.val, memVal1)
+	tvm.p.storeReg(argReg2.val, memVal2)
 	tvm.p.And(argReg1, argReg2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != memVal1&memVal2 {
+	if tvm.p.loadReg(argReg3.val) != memVal1&memVal2 {
 		t.Errorf("wrong And")
 	}
 	*tvm = *newTestVM()
@@ -175,10 +175,10 @@ func (tvm *testVM) testOr(t *testing.T) {
 
 	memVal1 := 983
 	memVal2 := -62
-	tvm.p.storeInReg(argReg1.val, memVal1)
-	tvm.p.storeInReg(argReg2.val, memVal2)
+	tvm.p.storeReg(argReg1.val, memVal1)
+	tvm.p.storeReg(argReg2.val, memVal2)
 	tvm.p.Or(argReg1, argReg2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != memVal1|memVal2 {
+	if tvm.p.loadReg(argReg3.val) != memVal1|memVal2 {
 		t.Errorf("wrong Or")
 	}
 	*tvm = *newTestVM()
@@ -192,10 +192,10 @@ func (tvm *testVM) testXor(t *testing.T) {
 
 	memVal1 := 983
 	memVal2 := -62
-	tvm.p.storeInReg(argReg1.val, memVal1)
-	tvm.p.storeInReg(argReg2.val, memVal2)
+	tvm.p.storeReg(argReg1.val, memVal1)
+	tvm.p.storeReg(argReg2.val, memVal2)
 	tvm.p.Xor(argReg1, argReg2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != memVal1^memVal2 {
+	if tvm.p.loadReg(argReg3.val) != memVal1^memVal2 {
 		t.Errorf("wrong Or")
 	}
 	*tvm = *newTestVM()
@@ -239,7 +239,7 @@ func (tvm *testVM) testLdi(t *testing.T) {
 	val := -24
 	tvm.vm.field.PutInt32(tvm.p.pc+(i1+i2)%consts.IdxMod, val)
 	tvm.p.Ldi(argInd1, argDir2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != val {
+	if tvm.p.loadReg(argReg3.val) != val {
 		t.Errorf("ldi: ind ind reg error")
 	}
 	*tvm = *newTestVM()
@@ -254,11 +254,11 @@ func (tvm *testVM) testSti(t *testing.T) {
 	argReg3 := arg{consts.TRegIdCode, 3}
 
 	val := 8984
-	tvm.p.storeInReg(argReg1.val, val)
+	tvm.p.storeReg(argReg1.val, val)
 	i1 := consts.IdxMod + 1
 	tvm.vm.field.PutInt32(argInd2.val, i1)
 	i2 := 33
-	tvm.p.storeInReg(argReg3.val, i2)
+	tvm.p.storeReg(argReg3.val, i2)
 	tvm.p.Sti(argReg1, argInd2, argReg3)
 	if tvm.vm.field.GetInt32(tvm.p.pc+(i1+i2)%consts.IdxMod) != val {
 		t.Errorf("sti error")
@@ -323,7 +323,7 @@ func (tvm *testVM) testLldi(t *testing.T) {
 	val := -24
 	tvm.vm.field.PutInt32(tvm.p.pc+(i1+i2), val)
 	tvm.p.Lldi(argInd1, argDir2, argReg3)
-	if tvm.p.loadFromReg(argReg3.val) != val {
+	if tvm.p.loadReg(argReg3.val) != val {
 		t.Errorf("ldi: ind ind reg error")
 	}
 	*tvm = *newTestVM()

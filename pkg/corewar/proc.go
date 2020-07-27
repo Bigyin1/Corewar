@@ -36,11 +36,11 @@ func (p *proc) copy(pc int) {
 	p.vm.procs.Put(&newProc)
 }
 
-func (p *proc) storeInReg(rIdx int, val int) {
+func (p *proc) storeReg(rIdx int, val int) {
 	p.regs[rIdx-1] = val
 }
 
-func (p *proc) loadFromReg(rIdx int) int {
+func (p *proc) loadReg(rIdx int) int {
 	return p.regs[rIdx-1]
 }
 
@@ -53,8 +53,7 @@ func (p *proc) loadArgVal(posArgs uint8, from arg, nomod ...bool) int {
 	}
 
 	if from.typ == consts.TRegIdCode {
-
-		return p.loadFromReg(from.val)
+		return p.loadReg(from.val)
 	}
 	if len(nomod) == 0 {
 		from.val %= consts.IdxMod
@@ -68,7 +67,7 @@ func (p *proc) storeValToArg(posArgs uint8, to arg, val int) {
 		panic("wrong val type")
 	}
 	if to.typ == consts.TRegIdCode {
-		p.storeInReg(to.val, val)
+		p.storeReg(to.val, val)
 	}
 
 	to.val %= consts.IdxMod
