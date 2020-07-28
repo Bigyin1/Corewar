@@ -54,7 +54,7 @@ func newTestVM() *testVM {
 func (tvm *testVM) testLive(t *testing.T) {
 	tvm.p.cmdMeta = consts.InstructionsConfig[consts.LIVE]
 	arg := arg{consts.TDirIdCode, 1}
-	tvm.p.Live(arg)
+	Live(tvm.p, arg)
 	if tvm.vm.lastAlive.id != arg.val {
 		t.Errorf("wrong last alive player")
 		return
@@ -72,20 +72,20 @@ func (tvm *testVM) testLD(t *testing.T) {
 	argDir := arg{consts.TDirIdCode, 42}
 	argReg := arg{consts.TRegIdCode, 2}
 
-	tvm.p.Ld(argDir, argReg)
+	Ld(tvm.p, argDir, argReg)
 	if tvm.p.regs[argReg.val-1] != argDir.val {
 		t.Errorf("direct arg")
 	}
 
 	memVal := -322
 	argInd := arg{consts.TIndIdCode, consts.IdxMod + 2}
-	tvm.vm.field.PutInt32(argInd.val%consts.IdxMod, memVal)
-	tvm.p.Ld(argInd, argReg)
+	tvm.vm.field.putInt32(argInd.val%consts.IdxMod, memVal)
+	Ld(tvm.p, argInd, argReg)
 	if tvm.p.regs[argReg.val-1] != memVal {
 		t.Errorf("indirect arg")
 	}
 
-	tvm.p.Ld(arg{consts.TDirIdCode, 0}, argReg)
+	Ld(tvm.p, arg{consts.TDirIdCode, 0}, argReg)
 	if !tvm.p.carry {
 		t.Errorf("carry shoul be 1")
 	}
@@ -99,7 +99,7 @@ func (tvm *testVM) testST(t *testing.T) {
 
 	memVal := 983
 	tvm.p.storeReg(argReg1.val, memVal)
-	tvm.p.St(argReg1, argReg2)
+	St(tvm.p, argReg1, argReg2)
 	if tvm.p.loadReg(argReg2.val) != memVal {
 		t.Errorf("two registers")
 	}
@@ -108,8 +108,8 @@ func (tvm *testVM) testST(t *testing.T) {
 	argReg := arg{consts.TRegIdCode, 1}
 	argInd := arg{consts.TIndIdCode, len(tvm.vm.field.m) + consts.IdxMod}
 	tvm.p.storeReg(argReg1.val, memVal)
-	tvm.p.St(argReg, argInd)
-	if tvm.vm.field.GetInt32(argInd.val%consts.IdxMod) != memVal {
+	St(tvm.p, argReg, argInd)
+	if tvm.vm.field.getInt32(argInd.val%consts.IdxMod) != memVal {
 		t.Errorf("indirect")
 	}
 
@@ -126,7 +126,7 @@ func (tvm *testVM) testAdd(t *testing.T) {
 	memVal2 := -62
 	tvm.p.storeReg(argReg1.val, memVal1)
 	tvm.p.storeReg(argReg2.val, memVal2)
-	tvm.p.Add(argReg1, argReg2, argReg3)
+	Add(tvm.p, argReg1, argReg2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != memVal1+memVal2 {
 		t.Errorf("wrong sum")
 	}
@@ -143,7 +143,7 @@ func (tvm *testVM) testSub(t *testing.T) {
 	memVal2 := -62
 	tvm.p.storeReg(argReg1.val, memVal1)
 	tvm.p.storeReg(argReg2.val, memVal2)
-	tvm.p.Sub(argReg1, argReg2, argReg3)
+	Sub(tvm.p, argReg1, argReg2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != memVal1-memVal2 {
 		t.Errorf("wrong Sub")
 	}
@@ -160,7 +160,7 @@ func (tvm *testVM) testAnd(t *testing.T) {
 	memVal2 := -62
 	tvm.p.storeReg(argReg1.val, memVal1)
 	tvm.p.storeReg(argReg2.val, memVal2)
-	tvm.p.And(argReg1, argReg2, argReg3)
+	And(tvm.p, argReg1, argReg2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != memVal1&memVal2 {
 		t.Errorf("wrong And")
 	}
@@ -177,7 +177,7 @@ func (tvm *testVM) testOr(t *testing.T) {
 	memVal2 := -62
 	tvm.p.storeReg(argReg1.val, memVal1)
 	tvm.p.storeReg(argReg2.val, memVal2)
-	tvm.p.Or(argReg1, argReg2, argReg3)
+	Or(tvm.p, argReg1, argReg2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != memVal1|memVal2 {
 		t.Errorf("wrong Or")
 	}
@@ -194,7 +194,7 @@ func (tvm *testVM) testXor(t *testing.T) {
 	memVal2 := -62
 	tvm.p.storeReg(argReg1.val, memVal1)
 	tvm.p.storeReg(argReg2.val, memVal2)
-	tvm.p.Xor(argReg1, argReg2, argReg3)
+	Xor(tvm.p, argReg1, argReg2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != memVal1^memVal2 {
 		t.Errorf("wrong Or")
 	}
@@ -210,7 +210,7 @@ func (tvm *testVM) testZjmp(t *testing.T) {
 	tvm.p.carry = true
 	tvm.p.pc = currPC
 	argDir1 := arg{consts.TDirIdCode, jmpLen}
-	tvm.p.Zjmp(argDir1)
+	Zjmp(tvm.p, argDir1)
 	if tvm.p.pc != currPC+jmpLen%consts.IdxMod {
 		t.Errorf("wrong zjmp with carry")
 	}
@@ -218,7 +218,7 @@ func (tvm *testVM) testZjmp(t *testing.T) {
 	// w/o carry
 	tvm.p.carry = false
 	currPC = tvm.p.pc
-	tvm.p.Zjmp(argDir1)
+	Zjmp(tvm.p, argDir1)
 	if tvm.p.pc != currPC {
 		t.Errorf("wrong zjmp w/o carry")
 	}
@@ -233,12 +233,12 @@ func (tvm *testVM) testLdi(t *testing.T) {
 	argReg3 := arg{consts.TRegIdCode, 16}
 
 	i1 := consts.IdxMod + 1
-	tvm.vm.field.PutInt32(argInd1.val, i1)
+	tvm.vm.field.putInt32(argInd1.val, i1)
 	i2 := 33
 	argDir2 := arg{consts.TDirIdCode, i2}
 	val := -24
-	tvm.vm.field.PutInt32(tvm.p.pc+(i1+i2)%consts.IdxMod, val)
-	tvm.p.Ldi(argInd1, argDir2, argReg3)
+	tvm.vm.field.putInt32(tvm.p.pc+(i1+i2)%consts.IdxMod, val)
+	Ldi(tvm.p, argInd1, argDir2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != val {
 		t.Errorf("ldi: ind ind reg error")
 	}
@@ -256,11 +256,11 @@ func (tvm *testVM) testSti(t *testing.T) {
 	val := 8984
 	tvm.p.storeReg(argReg1.val, val)
 	i1 := consts.IdxMod + 1
-	tvm.vm.field.PutInt32(argInd2.val, i1)
+	tvm.vm.field.putInt32(argInd2.val, i1)
 	i2 := 33
 	tvm.p.storeReg(argReg3.val, i2)
-	tvm.p.Sti(argReg1, argInd2, argReg3)
-	if tvm.vm.field.GetInt32(tvm.p.pc+(i1+i2)%consts.IdxMod) != val {
+	Sti(tvm.p, argReg1, argInd2, argReg3)
+	if tvm.vm.field.getInt32(tvm.p.pc+(i1+i2)%consts.IdxMod) != val {
 		t.Errorf("sti error")
 	}
 	*tvm = *newTestVM()
@@ -273,7 +273,7 @@ func (tvm *testVM) testFork(t *testing.T) {
 
 	tvm.p.regs[0] = 4
 	tvm.p.regs[15] = -34
-	tvm.p.Fork(argDir1)
+	Fork(tvm.p, argDir1)
 	if tvm.vm.procs.l.pc != argDir1.val%consts.IdxMod {
 		t.Errorf("wrong forked pc")
 		return
@@ -289,20 +289,20 @@ func (tvm *testVM) testLLD(t *testing.T) {
 	argDir := arg{consts.TDirIdCode, 42}
 	argReg := arg{consts.TRegIdCode, 2}
 
-	tvm.p.Ld(argDir, argReg)
+	Ld(tvm.p, argDir, argReg)
 	if tvm.p.regs[argReg.val-1] != argDir.val {
 		t.Errorf("direct arg")
 	}
 
 	memVal := -322
 	argInd := arg{consts.TIndIdCode, consts.IdxMod + 2}
-	tvm.vm.field.PutInt32(argInd.val, memVal)
-	tvm.p.Lld(argInd, argReg)
+	tvm.vm.field.putInt32(argInd.val, memVal)
+	Lld(tvm.p, argInd, argReg)
 	if tvm.p.regs[argReg.val-1] != memVal {
 		t.Errorf("indirect arg")
 	}
 
-	tvm.p.Ld(arg{consts.TDirIdCode, 0}, argReg)
+	Ld(tvm.p, arg{consts.TDirIdCode, 0}, argReg)
 	if !tvm.p.carry {
 		t.Errorf("carry shoul be 1")
 	}
@@ -317,12 +317,12 @@ func (tvm *testVM) testLldi(t *testing.T) {
 	argReg3 := arg{consts.TRegIdCode, 16}
 
 	i1 := consts.IdxMod + 1
-	tvm.vm.field.PutInt32(argInd1.val, i1)
+	tvm.vm.field.putInt32(argInd1.val, i1)
 	i2 := 33
 	argDir2 := arg{consts.TDirIdCode, i2}
 	val := -24
-	tvm.vm.field.PutInt32(tvm.p.pc+(i1+i2), val)
-	tvm.p.Lldi(argInd1, argDir2, argReg3)
+	tvm.vm.field.putInt32(tvm.p.pc+(i1+i2), val)
+	Lldi(tvm.p, argInd1, argDir2, argReg3)
 	if tvm.p.loadReg(argReg3.val) != val {
 		t.Errorf("ldi: ind ind reg error")
 	}
@@ -336,7 +336,7 @@ func (tvm *testVM) testLfork(t *testing.T) {
 
 	tvm.p.regs[0] = 4
 	tvm.p.regs[15] = -34
-	tvm.p.Lfork(argDir1)
+	Lfork(tvm.p, argDir1)
 	if tvm.vm.procs.l.pc != argDir1.val {
 		t.Errorf("wrong forked pc")
 		return

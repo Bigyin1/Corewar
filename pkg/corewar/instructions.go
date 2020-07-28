@@ -7,7 +7,7 @@ type arg struct {
 	val int
 }
 
-func (p *proc) Live(args ...arg) {
+func Live(p *proc, args ...arg) {
 	if len(args) != 1 {
 		panic("Live: wrong args count")
 	}
@@ -20,7 +20,7 @@ func (p *proc) Live(args ...arg) {
 	p.execLeft = p.cmdMeta.CyclesToExec
 }
 
-func (p *proc) Ld(args ...arg) {
+func Ld(p *proc, args ...arg) {
 	defer func() {
 		p.execLeft = p.cmdMeta.CyclesToExec
 	}()
@@ -36,7 +36,7 @@ func (p *proc) Ld(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[1], args[1], val1)
 }
 
-func (p *proc) St(args ...arg) {
+func St(p *proc, args ...arg) {
 	defer func() {
 		p.execLeft = p.cmdMeta.CyclesToExec
 	}()
@@ -49,7 +49,7 @@ func (p *proc) St(args ...arg) {
 
 }
 
-func (p *proc) Add(args ...arg) {
+func Add(p *proc, args ...arg) {
 
 	if len(args) != 3 {
 		panic("Add: wrong args count")
@@ -60,7 +60,7 @@ func (p *proc) Add(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], val1+val2)
 }
 
-func (p *proc) Sub(args ...arg) {
+func Sub(p *proc, args ...arg) {
 
 	if len(args) != 3 {
 		panic("Sub: wrong args count")
@@ -70,7 +70,7 @@ func (p *proc) Sub(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], val1-val2)
 }
 
-func (p *proc) And(args ...arg) {
+func And(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("And: wrong args count")
 	}
@@ -84,7 +84,7 @@ func (p *proc) And(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], res)
 }
 
-func (p *proc) Or(args ...arg) {
+func Or(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("And: wrong args count")
 	}
@@ -98,7 +98,7 @@ func (p *proc) Or(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], res)
 }
 
-func (p *proc) Xor(args ...arg) {
+func Xor(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("And: wrong args count")
 	}
@@ -112,7 +112,7 @@ func (p *proc) Xor(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], res)
 }
 
-func (p *proc) Zjmp(args ...arg) {
+func Zjmp(p *proc, args ...arg) {
 	if len(args) != 1 {
 		panic("Zjmp: wrong args count")
 	}
@@ -123,7 +123,7 @@ func (p *proc) Zjmp(args ...arg) {
 	}
 }
 
-func (p *proc) Ldi(args ...arg) {
+func Ldi(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("Ldi: wrong args count")
 	}
@@ -131,10 +131,10 @@ func (p *proc) Ldi(args ...arg) {
 	val1 := p.loadArgVal(p.cmdMeta.AllowedArgs[0], args[0])
 	val2 := p.loadArgVal(p.cmdMeta.AllowedArgs[1], args[1])
 	addr := p.pc + (val1+val2)%consts.IdxMod
-	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], p.vm.field.GetInt32(addr))
+	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], p.vm.field.getInt32(addr))
 }
 
-func (p *proc) Sti(args ...arg) {
+func Sti(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("Sti: wrong args count")
 	}
@@ -144,15 +144,15 @@ func (p *proc) Sti(args ...arg) {
 	val2 := p.loadArgVal(p.cmdMeta.AllowedArgs[2], args[2])
 
 	addr := p.pc + (val1+val2)%consts.IdxMod
-	p.vm.field.PutInt32(addr, storeVal)
+	p.vm.field.putInt32(addr, storeVal)
 }
 
-func (p *proc) Fork(args ...arg) {
+func Fork(p *proc, args ...arg) {
 	pc := p.loadArgVal(p.cmdMeta.AllowedArgs[0], args[0])
 	p.copy(pc % consts.IdxMod)
 }
 
-func (p *proc) Lld(args ...arg) {
+func Lld(p *proc, args ...arg) {
 	defer func() {
 		p.execLeft = p.cmdMeta.CyclesToExec
 	}()
@@ -168,7 +168,7 @@ func (p *proc) Lld(args ...arg) {
 	p.storeValToArg(p.cmdMeta.AllowedArgs[1], args[1], val1)
 }
 
-func (p *proc) Lldi(args ...arg) {
+func Lldi(p *proc, args ...arg) {
 	if len(args) != 3 {
 		panic("Ldi: wrong args count")
 	}
@@ -176,10 +176,12 @@ func (p *proc) Lldi(args ...arg) {
 	val1 := p.loadArgVal(p.cmdMeta.AllowedArgs[0], args[0])
 	val2 := p.loadArgVal(p.cmdMeta.AllowedArgs[1], args[1])
 	addr := p.pc + (val1 + val2)
-	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], p.vm.field.GetInt32(addr))
+	p.storeValToArg(p.cmdMeta.AllowedArgs[2], args[2], p.vm.field.getInt32(addr))
 }
 
-func (p *proc) Lfork(args ...arg) {
+func Lfork(p *proc, args ...arg) {
 	pc := p.loadArgVal(p.cmdMeta.AllowedArgs[0], args[0])
 	p.copy(pc)
 }
+
+func Aff(p *proc, args ...arg) {}
