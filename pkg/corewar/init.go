@@ -128,7 +128,7 @@ func (vm *VM) initProcs() {
 	var idxStep = consts.MemSize / len(vm.players)
 
 	for i := range vm.players {
-		vm.field.PutCodeAt(idx, vm.players[i].code)
+		vm.field.putCodeAt(idx, vm.players[i].code)
 		vm.procs.Put(newProc(procID, vm.players[i].id, idx, vm))
 
 		vm.players[i].code = nil // deallocate

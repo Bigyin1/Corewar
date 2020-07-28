@@ -15,7 +15,7 @@ func newField(sz int) *field {
 	}
 }
 
-func (f *field) PutCodeAt(idx int, code []byte) {
+func (f *field) putCodeAt(idx int, code []byte) {
 	copy(f.m[idx:], code)
 }
 
@@ -41,7 +41,7 @@ func (f *field) storeAt(idx int, d []byte) {
 	copy(f.m[0:], d[c:])
 }
 
-func (f *field) GetInt32(idx int) int {
+func (f *field) getInt32(idx int) int {
 	var res int32
 	var buf [4]byte
 	f.loadFrom(idx, buf[:])
@@ -49,7 +49,7 @@ func (f *field) GetInt32(idx int) int {
 	return int(res)
 }
 
-func (f *field) PutInt32(idx int, val int) {
+func (f *field) putInt32(idx int, val int) {
 	var buf = bytes.NewBuffer(make([]byte, 0, 4))
 	_ = binary.Write(buf, binary.BigEndian, int32(val))
 	f.storeAt(idx, buf.Bytes())

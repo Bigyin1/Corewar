@@ -31,8 +31,8 @@ func TestVMField(t *testing.T) {
 			t.Errorf("stored And loaded bytes are not equal")
 			return
 		}
-		f.PutInt32(tests[i].idx, tests[i].intVal)
-		if f.GetInt32(tests[i].idx) != tests[i].intVal {
+		f.putInt32(tests[i].idx, tests[i].intVal)
+		if f.getInt32(tests[i].idx) != tests[i].intVal {
 			t.Errorf("stored And loaded int32 are not equal")
 		}
 	}

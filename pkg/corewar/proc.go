@@ -12,13 +12,15 @@ func newProc(id, plID, initPos int, vm *VM) *proc {
 
 type proc struct {
 	id        int
-	carry     bool
 	cmdMeta   consts.InstructionMeta
 	liveCycle int
-	execLeft  int
-	pc        int
 	b2nextOp  int
-	regs      [consts.RegNumber]int
+
+	regs       [consts.RegNumber]int
+	execLeft   int
+	pc         int
+	carry      bool
+	currOpCode byte
 
 	vm   *VM
 	next *proc
@@ -59,7 +61,7 @@ func (p *proc) loadArgVal(posArgs uint8, from arg, nomod ...bool) int {
 		from.val %= consts.IdxMod
 	}
 
-	return p.vm.field.GetInt32(p.pc + from.val)
+	return p.vm.field.getInt32(p.pc + from.val)
 }
 
 func (p *proc) storeValToArg(posArgs uint8, to arg, val int) {
@@ -71,5 +73,5 @@ func (p *proc) storeValToArg(posArgs uint8, to arg, val int) {
 	}
 
 	to.val %= consts.IdxMod
-	p.vm.field.PutInt32(p.pc+to.val, val)
+	p.vm.field.putInt32(p.pc+to.val, val)
 }
