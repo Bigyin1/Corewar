@@ -12,15 +12,14 @@ func newProc(id, plID, initPos int, vm *VM) *proc {
 
 type proc struct {
 	id        int
-	cmdMeta   consts.InstructionMeta
 	liveCycle int
-	b2nextOp  int
 
 	regs       [consts.RegNumber]int
 	execLeft   int
 	pc         int
 	carry      bool
 	currOpCode byte
+	opMeta     consts.InstructionMeta
 
 	vm   *VM
 	next *proc
@@ -46,7 +45,7 @@ func (p *proc) loadReg(rIdx int) int {
 	return p.regs[rIdx-1]
 }
 
-func (p *proc) loadArgVal(posArgs uint8, from arg, nomod ...bool) int {
+func (p *proc) loadArgVal(posArgs consts.TypeID, from arg, nomod ...bool) int {
 	if posArgs&from.typ == 0 {
 		panic("wrong val type")
 	}
@@ -64,7 +63,7 @@ func (p *proc) loadArgVal(posArgs uint8, from arg, nomod ...bool) int {
 	return p.vm.field.getInt32(p.pc + from.val)
 }
 
-func (p *proc) storeValToArg(posArgs uint8, to arg, val int) {
+func (p *proc) storeValToArg(posArgs consts.TypeID, to arg, val int) {
 	if posArgs&to.typ == 0 {
 		panic("wrong val type")
 	}

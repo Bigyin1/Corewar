@@ -2,26 +2,27 @@ package compiler
 
 import (
 	"corewar/pkg/asm/parser"
+	"corewar/pkg/asm/tokenizer"
 	"corewar/pkg/consts"
 	"fmt"
 )
 
-func (c Compiler) getExpectedArgTypes(expArgCodes uint8) string {
+func (c Compiler) getExpectedArgTypes(expArgCodes consts.TypeID) string {
 	res := ""
 	if expArgCodes&consts.TRegIdCode != 0 {
-		res += consts.TReg.ArgTypeName
+		res += tokenizer.TReg.ArgTypeName
 	}
 	if expArgCodes&consts.TDirIdCode != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += consts.TDir.ArgTypeName
+		res += tokenizer.TDir.ArgTypeName
 	}
 	if expArgCodes&consts.TIndIdCode != 0 {
 		if len(res) != 0 {
 			res += " or "
 		}
-		res += consts.TInd.ArgTypeName
+		res += tokenizer.TInd.ArgTypeName
 	}
 	return res
 }

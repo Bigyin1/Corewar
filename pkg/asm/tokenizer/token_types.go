@@ -5,6 +5,25 @@ import (
 	"errors"
 )
 
+type ArgumentType struct {
+	ArgTypeIDCode consts.TypeID
+	ArgTypeName   string
+	ByteCode      uint8
+	Size          int
+}
+
+var (
+	TReg = ArgumentType{consts.TRegIdCode, "T_REG",
+		consts.TypeIDToByteCode(consts.TRegIdCode),
+		consts.RegArgSize}
+	TDir = ArgumentType{consts.TDirIdCode, "T_DIR",
+		consts.TypeIDToByteCode(consts.TDirIdCode),
+		consts.DirArgSize}
+	TInd = ArgumentType{consts.TIndIdCode, "T_IND",
+		consts.TypeIDToByteCode(consts.TIndIdCode),
+		consts.IndArgSize}
+)
+
 type TokenType string
 
 func (tt TokenType) IsOfArgType() bool {
@@ -35,23 +54,23 @@ func (tt TokenType) IsRegisterArgType() bool {
 	return false
 }
 
-func (tt TokenType) GetArgType() consts.ArgumentType {
+func (tt TokenType) GetArgType() ArgumentType {
 	if tt == Register {
-		return consts.TReg
+		return TReg
 	}
 	if tt == Direct {
-		return consts.TDir
+		return TDir
 	}
 	if tt == DirectLabel {
-		return consts.TDir
+		return TDir
 	}
 	if tt == Indirect {
-		return consts.TInd
+		return TInd
 	}
 	if tt == IndirectLabel {
-		return consts.TInd
+		return TInd
 	}
-	return consts.ArgumentType{}
+	return ArgumentType{}
 }
 
 var EOFErr = errors.New("EOF")

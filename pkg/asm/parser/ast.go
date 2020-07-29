@@ -37,6 +37,6 @@ type InstructionNode struct {
 
 type InstructionArgument struct {
 	Token tokenizer.Token
-	Type  consts.ArgumentType
+	Type  tokenizer.ArgumentType
 	Value interface{}
 }

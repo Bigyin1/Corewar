@@ -32,8 +32,8 @@ func (vm *VM) Start(pd ...PlayerData) error {
 	if err := vm.loadPlayersMeta(pd); err != nil {
 		return err
 	}
+	vm.lastAlive = &vm.players[len(vm.players)-1]
 	vm.initProcs()
-	vm.started = true
 	return nil
 }
 

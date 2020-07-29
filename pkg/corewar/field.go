@@ -49,6 +49,20 @@ func (f *field) getInt32(idx int) int {
 	return int(res)
 }
 
+func (f *field) getInt16(idx int) int {
+	var res int16
+	var buf [2]byte
+	f.loadFrom(idx, buf[:])
+	_ = binary.Read(bytes.NewReader(buf[:]), binary.BigEndian, &res)
+	return int(res)
+}
+
+func (f *field) getByte(idx int) byte {
+	var buf [1]byte
+	f.loadFrom(idx, buf[:])
+	return buf[0]
+}
+
 func (f *field) putInt32(idx int, val int) {
 	var buf = bytes.NewBuffer(make([]byte, 0, 4))
 	_ = binary.Write(buf, binary.BigEndian, int32(val))
