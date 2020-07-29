@@ -17,6 +17,7 @@ CORFILES = $(ASMTESTFILES:.asm=.cor)
 
 .PHONY: corewar-test
 corewar-test: as $(CORFILES)
+	@echo $(CORFILES)
 	go test ./pkg/corewar
 %.cor: %.asm
 	./as $<

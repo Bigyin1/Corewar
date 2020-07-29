@@ -92,8 +92,8 @@ func (c *Compiler) PrintAnnotatedCode(w io.Writer) {
 				c.getArgTypeCode(cmd.Instruction.Args))
 		}
 		for _, arg := range cmd.Instruction.Args {
-			_, _ = fmt.Fprintf(annotations, "%0x(%v, %v) ",
-				arg.Value, arg.Token.Value, arg.Value)
+			_, _ = fmt.Fprintf(annotations, "%0x(%v, %v, %d) ",
+				arg.Value, arg.Token.Value, arg.Value, arg.Type.Size)
 		}
 		_, _ = fmt.Fprintf(annotations, "\n")
 	}
