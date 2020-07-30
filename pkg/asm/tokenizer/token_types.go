@@ -91,5 +91,7 @@ const (
 	LineBreak               = "LINE_BREAK"
 	Sum                     = "SUM"
 	Sub                     = "SUB"
+	Comment                 = "COMMENT"
+	Symbol                  = "SYMBOL"
 	EOF                     = "EOF"
 )

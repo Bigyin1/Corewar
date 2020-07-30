@@ -186,17 +186,30 @@ func (t *Tokenizer) getTokenType() (Token, int, error) {
 			Value: "\n",
 		}, 1, nil
 	}
-	if strings.HasPrefix(currStr, "+") {
+	//if strings.HasPrefix(currStr, "+") {
+	//	return Token{
+	//		Type:  Sum,
+	//		Value: "+",
+	//	}, 1, nil
+	//}
+	//if strings.HasPrefix(currStr, "-") {
+	//	return Token{
+	//		Type:  Sub,
+	//		Value: "-",
+	//	}, 1, nil
+	//}
+	if strings.HasPrefix(currStr, consts.CommentSymbol) {
+		idx := strings.Index(currStr, "\n")
+		if idx == -1 {
+			return Token{
+				Type:  Comment,
+				Value: currStr,
+			}, len(currStr), nil
+		}
 		return Token{
-			Type:  Sum,
-			Value: "+",
-		}, 1, nil
-	}
-	if strings.HasPrefix(currStr, "-") {
-		return Token{
-			Type:  Sub,
-			Value: "-",
-		}, 1, nil
+			Type:  Comment,
+			Value: currStr,
+		}, len(currStr[:idx]), nil
 	}
 	if label, ok := t.isLabel(currStr); ok {
 		return Token{

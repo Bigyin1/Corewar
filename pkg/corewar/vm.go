@@ -1,9 +1,16 @@
 package corewar
 
-import "corewar/pkg/consts"
+import (
+	"corewar/pkg/consts"
+	"fmt"
+	"io"
+	"log"
+	"os"
+)
 
 type procList struct {
-	l *proc
+	l   *proc
+	lId int
 }
 
 func (pl *procList) Put(np *proc) {
@@ -11,6 +18,8 @@ func (pl *procList) Put(np *proc) {
 		pl.l = np
 		return
 	}
+	pl.lId++
+	np.id = pl.lId
 	np.next = pl.l
 	pl.l = np
 }
@@ -40,7 +49,7 @@ func (pl *procList) IsEmpty() bool {
 	return false
 }
 
-func (pl procList) exec(f func(p *proc)) {
+func (pl procList) Exec(f func(p *proc)) {
 	currProc := pl.l
 	for currProc != nil {
 		f(currProc)
@@ -58,6 +67,7 @@ type VM struct {
 	cyclesToDie  int
 	eqInARow     int // for ho many checks, cyclesToDie is equal
 	checksPassed int
+	log          bool
 	dump         bool
 }
 
@@ -66,7 +76,7 @@ func (vm *VM) check() {
 		return
 	}
 	var toDel []int
-	vm.procs.exec(func(p *proc) {
+	vm.procs.Exec(func(p *proc) {
 		if vm.currCycle-p.liveCycle >= vm.cyclesToDie {
 			toDel = append(toDel, p.id)
 			return
@@ -89,8 +99,30 @@ func (vm *VM) check() {
 	}
 }
 
+func (vm *VM) IntroducePlayers(w io.Writer) {
+	_, _ = fmt.Fprintf(w, "Introducing contestants...\n")
+	for _, p := range vm.players {
+		_, _ = fmt.Fprintf(w, "* Player %d, weighting %d bytes, %s, (%s)\n",
+			p.id,
+			p.size,
+			p.name,
+			p.comment)
+	}
+}
+
+func (vm *VM) GetWinner() string {
+	return vm.lastAlive.name
+}
+
 func (vm *VM) Cycle() (isEnd bool) {
-	vm.procs.exec((*proc).Cycle)
+	defer func() {
+		if err := recover(); err != nil {
+			vm.field.dump(os.Stderr)
+			log.Fatalln(err)
+		}
+	}()
+
+	vm.procs.Exec((*proc).Cycle)
 	vm.check()
 	if vm.procs.IsEmpty() {
 		isEnd = true

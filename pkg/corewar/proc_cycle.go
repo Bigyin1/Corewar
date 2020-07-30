@@ -1,6 +1,9 @@
 package corewar
 
-import "corewar/pkg/consts"
+import (
+	"corewar/pkg/consts"
+	"fmt"
+)
 
 type instr struct {
 	meta consts.InstructionMeta
@@ -40,8 +43,22 @@ func (p *proc) getArgSize(tid consts.TypeID) int {
 }
 
 func (p *proc) shiftToNextOp(argTypes []consts.TypeID) {
+	p.pc += 1 //opcode
+	if p.opMeta.IsArgTypeCode {
+		p.pc += 1
+	}
 	for _, at := range argTypes {
 		p.pc += p.getArgSize(at)
+	}
+}
+
+func (p *proc) shiftToNextOp2(args []arg) {
+	p.pc += 1 //opcode
+	if p.opMeta.IsArgTypeCode {
+		p.pc += 1
+	}
+	for _, a := range args {
+		p.pc += p.getArgSize(a.typ)
 	}
 }
 
@@ -53,25 +70,33 @@ func (p *proc) parseArgsTypes() ([]consts.TypeID, bool) {
 	var ok = true
 
 	var expArgs []consts.TypeID
-	argTypeCode := p.vm.field.getByte(p.pc)
-	p.pc += 1
+	argTypeCode := p.vm.field.getByte(p.pc + 1)
 	offset := 6
+	toLeft := 0
 	for _, aa := range p.opMeta.AllowedArgs {
 		var byteCode byte
 		byteCode |= argTypeCode
+		byteCode <<= toLeft
 		byteCode >>= offset
+		if byteCode == 0 {
+			ok = false
+			return nil, ok
+		}
 		argType := consts.ByteCodeToTypeID(byteCode)
 		if argType&aa == 0 {
 			ok = false
 		}
 		expArgs = append(expArgs, argType)
-		offset -= 2
+		toLeft += 2
 	}
 	return expArgs, ok
 }
 
 func (p *proc) parseArgValues(argTypes []consts.TypeID) (args []arg, ok bool) {
-	var offset int
+	var offset = 1
+	if p.opMeta.IsArgTypeCode {
+		offset++
+	}
 	ok = true
 	for _, at := range argTypes {
 		switch at {
@@ -110,7 +135,6 @@ func (p *proc) getOpArgs() ([]arg, bool) {
 		p.shiftToNextOp(argTypes)
 		return nil, false
 	}
-	p.shiftToNextOp(argTypes)
 	return args, true
 }
 
@@ -119,7 +143,6 @@ func (p *proc) setOpCode() {
 		return
 	}
 	p.currOpCode = p.vm.field.getByte(p.pc)
-	p.pc += 1
 	if p.currOpCode <= 0x10 && p.currOpCode >= 0x01 {
 		op := opcodeToInstr[p.currOpCode-1]
 		p.execLeft = op.meta.CyclesToExec
@@ -132,6 +155,7 @@ func (p *proc) execOp() {
 		return
 	}
 	if p.currOpCode > 0x10 || p.currOpCode < 0x01 {
+		p.pc++
 		return
 	}
 	op := opcodeToInstr[p.currOpCode-1]
@@ -145,6 +169,12 @@ func (p *proc) execOp() {
 }
 
 func (p *proc) Cycle() {
+	if p.vm.currCycle == 109 && p.id == 0 {
+		fmt.Println()
+	}
+	if p.id == 0 && p.vm.currCycle == 104 {
+		fmt.Print()
+	}
 	p.setOpCode()
 	if p.execLeft > 0 {
 		p.execLeft--

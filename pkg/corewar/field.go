@@ -3,6 +3,8 @@ package corewar
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
+	"io"
 )
 
 type field struct {
@@ -21,6 +23,9 @@ func (f *field) putCodeAt(idx int, code []byte) {
 
 func (f *field) loadFrom(idx int, d []byte) {
 	idx %= len(f.m)
+	if idx < 0 {
+		idx += len(f.m)
+	}
 	if idx+len(d) <= len(f.m) {
 		copy(d, f.m[idx:])
 		return
@@ -31,6 +36,9 @@ func (f *field) loadFrom(idx int, d []byte) {
 
 func (f *field) storeAt(idx int, d []byte) {
 	idx %= len(f.m)
+	if idx < 0 {
+		idx += len(f.m)
+	}
 
 	if idx+len(d) <= len(f.m) {
 		copy(f.m[idx:], d)
@@ -68,4 +76,17 @@ func (f *field) putInt32(idx int, val int) {
 	_ = binary.Write(buf, binary.BigEndian, int32(val))
 	f.storeAt(idx, buf.Bytes())
 	return
+}
+
+func (f *field) dump(w io.Writer) {
+	perLine := 32
+	for i, v := range f.m {
+		if i%perLine == 0 {
+			_, _ = fmt.Fprintf(w, "\n%#.4x : ", i)
+		}
+		_, _ = fmt.Fprintf(w, "%.2x ", v)
+		//if i == perLine-1 {
+		//	_, _ = fmt.Fprintf(w, "\n")
+		//}
+	}
 }

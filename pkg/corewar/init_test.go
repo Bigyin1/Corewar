@@ -19,7 +19,7 @@ func TestVM_Start(t *testing.T) {
 		}
 		d = append(d, PlayerData{Data: f})
 	}
-	vm := NewVM()
+	vm := NewVM(false)
 	err := vm.Start(d...)
 	if err != nil {
 		t.Errorf("got error: %s", err.Error())

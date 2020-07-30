@@ -38,7 +38,7 @@ func newTestVM() *testVM {
 	pc := 0
 	fieldSz := 33
 
-	vm := NewVM()
+	vm := NewVM(false)
 	vm.field = newField(fieldSz)
 	vm.players = []player{{id: 1}, {id: 2}, {id: 3}}
 	testProc := newProc(1, playerID, pc, vm)
@@ -73,6 +73,7 @@ func (tvm *testVM) testLD(t *testing.T) {
 	argReg := arg{consts.TRegIdCode, 2}
 
 	Ld(tvm.p, argDir, argReg)
+	tvm.p.pc = 0
 	if tvm.p.regs[argReg.val-1] != argDir.val {
 		t.Errorf("direct arg")
 	}
@@ -81,11 +82,13 @@ func (tvm *testVM) testLD(t *testing.T) {
 	argInd := arg{consts.TIndIdCode, consts.IdxMod + 2}
 	tvm.vm.field.putInt32(argInd.val%consts.IdxMod, memVal)
 	Ld(tvm.p, argInd, argReg)
+	tvm.p.pc = 0
 	if tvm.p.regs[argReg.val-1] != memVal {
 		t.Errorf("indirect arg")
 	}
 
 	Ld(tvm.p, arg{consts.TDirIdCode, 0}, argReg)
+	tvm.p.pc = 0
 	if !tvm.p.carry {
 		t.Errorf("carry shoul be 1")
 	}
@@ -100,6 +103,7 @@ func (tvm *testVM) testST(t *testing.T) {
 	memVal := 983
 	tvm.p.storeReg(argReg1.val, memVal)
 	St(tvm.p, argReg1, argReg2)
+	tvm.p.pc = 0
 	if tvm.p.loadReg(argReg2.val) != memVal {
 		t.Errorf("two registers")
 	}
@@ -219,7 +223,7 @@ func (tvm *testVM) testZjmp(t *testing.T) {
 	tvm.p.carry = false
 	currPC = tvm.p.pc
 	Zjmp(tvm.p, argDir1)
-	if tvm.p.pc != currPC {
+	if tvm.p.pc != currPC+1+consts.ShortDirSize {
 		t.Errorf("wrong zjmp w/o carry")
 	}
 	*tvm = *newTestVM()
@@ -260,7 +264,7 @@ func (tvm *testVM) testSti(t *testing.T) {
 	i2 := 33
 	tvm.p.storeReg(argReg3.val, i2)
 	Sti(tvm.p, argReg1, argInd2, argReg3)
-	if tvm.vm.field.getInt32(tvm.p.pc+(i1+i2)%consts.IdxMod) != val {
+	if tvm.vm.field.getInt32((i1+i2)%consts.IdxMod) != val {
 		t.Errorf("sti error")
 	}
 	*tvm = *newTestVM()
@@ -289,7 +293,8 @@ func (tvm *testVM) testLLD(t *testing.T) {
 	argDir := arg{consts.TDirIdCode, 42}
 	argReg := arg{consts.TRegIdCode, 2}
 
-	Ld(tvm.p, argDir, argReg)
+	Lld(tvm.p, argDir, argReg)
+	tvm.p.pc = 0
 	if tvm.p.regs[argReg.val-1] != argDir.val {
 		t.Errorf("direct arg")
 	}
@@ -298,11 +303,12 @@ func (tvm *testVM) testLLD(t *testing.T) {
 	argInd := arg{consts.TIndIdCode, consts.IdxMod + 2}
 	tvm.vm.field.putInt32(argInd.val, memVal)
 	Lld(tvm.p, argInd, argReg)
+	tvm.p.pc = 0
 	if tvm.p.regs[argReg.val-1] != memVal {
 		t.Errorf("indirect arg")
 	}
 
-	Ld(tvm.p, arg{consts.TDirIdCode, 0}, argReg)
+	Lld(tvm.p, arg{consts.TDirIdCode, 0}, argReg)
 	if !tvm.p.carry {
 		t.Errorf("carry shoul be 1")
 	}

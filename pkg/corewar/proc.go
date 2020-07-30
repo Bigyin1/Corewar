@@ -27,13 +27,15 @@ type proc struct {
 
 func (p *proc) copy(pc int) {
 
-	newProc := *p
+	var newProc proc
 
 	var newRegs [consts.RegNumber]int
 	copy(newRegs[:], p.regs[:])
 	newProc.regs = newRegs
 	newProc.pc = pc
-
+	newProc.vm = p.vm
+	newProc.carry = p.carry
+	newProc.liveCycle = p.liveCycle
 	p.vm.procs.Put(&newProc)
 }
 
@@ -69,6 +71,7 @@ func (p *proc) storeValToArg(posArgs consts.TypeID, to arg, val int) {
 	}
 	if to.typ == consts.TRegIdCode {
 		p.storeReg(to.val, val)
+		return
 	}
 
 	to.val %= consts.IdxMod

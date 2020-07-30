@@ -10,9 +10,10 @@ import (
 	"sort"
 )
 
-func NewVM() *VM {
+func NewVM(log bool) *VM {
 	return &VM{
 		cyclesToDie: consts.CyclesToDie,
+		log:         log,
 	}
 }
 
@@ -123,13 +124,14 @@ func (vm *VM) loadPlayersMeta(pd []PlayerData) error {
 func (vm *VM) initProcs() {
 	vm.field = newField(consts.MemSize)
 
-	var procID int
+	var procID = 1
 	var idx int
 	var idxStep = consts.MemSize / len(vm.players)
 
 	for i := range vm.players {
 		vm.field.putCodeAt(idx, vm.players[i].code)
 		vm.procs.Put(newProc(procID, vm.players[i].id, idx, vm))
+		vm.procs.lId = procID
 
 		vm.players[i].code = nil // deallocate
 		procID++

@@ -37,7 +37,7 @@ func (t *Tokenizer) Tokenize() error {
 			return fmt.Errorf("met unsupported token starting at line: %d, pos: %d (symbol:%c)",
 				t.currLine, t.currPosInLine, t.currChar())
 		}
-		if token.Type != Space {
+		if token.Type != Space && token.Type != Comment {
 			token.PosLine = t.currLine
 			token.PosColumn = t.currPosInLine
 			t.tokens = append(t.tokens, token)

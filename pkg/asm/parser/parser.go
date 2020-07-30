@@ -11,6 +11,13 @@ type Parser struct {
 	currentToken tokenizer.Token
 }
 
+func (p *Parser) eatCommentLine() {
+	for p.currentToken.Type != tokenizer.LineBreak {
+		_ = p.eatToken(p.currentToken.Type)
+	}
+	_ = p.eatToken(tokenizer.LineBreak)
+}
+
 func (p *Parser) eatLineBreaksSpaces() {
 	for p.currentToken.Type == tokenizer.LineBreak || p.currentToken.Type == tokenizer.Space {
 		_ = p.eatToken(p.currentToken.Type)

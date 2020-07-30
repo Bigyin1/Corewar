@@ -4,6 +4,7 @@ const NameHeader = ".name"
 const ChampNameLength = 64
 const CommentHeader = ".comment"
 const LabelChars = "abcdefghijklmnopqrstuvwxyz_0123456789"
+const CommentSymbol = "#"
 const RegNumber = 16
 const RegSize = 4
 const SeparatorSymbol = ","
@@ -64,6 +65,9 @@ func GetArgSize(m InstructionMeta, tid TypeID) int {
 }
 
 func ByteCodeToTypeID(bc byte) TypeID {
+	if bc-1 < 0 || int(bc-1) >= len(typeArr) {
+		panic("error")
+	}
 	return typeArr[bc-1]
 }
 
