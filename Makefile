@@ -1,23 +1,34 @@
-#asm
-ASM_SRC_DIRS = \
-	cmd/asm \
-	pkg/asm \
-	pkg/consts
+GO=go
 
-ASM_SRC_FILES = $(foreach i,$(ASM_SRC_DIRS),$(shell find $(i) -name "*.go" -not -name "test_*.go"))
+all: as corewar
 
 .PHONY: as
 as:
-	go build -o as cmd/asm/main.go
+	$(GO) build -o as cmd/asm/main.go
+
+.PHONY: corewar
+corewar:
+	$(GO) build -o corewar cmd/corewar/main.go
+
+
+.PHONY: examples
+examples: $(EXAMPCORFILES)
+	@echo $(EXAMPCORFILES)
+
 #tests
 TEST_VM_DIR=pkg/corewar/testdata
 
 ASMTESTFILES = $(wildcard $(TEST_VM_DIR)/*.asm)
 CORFILES = $(ASMTESTFILES:.asm=.cor)
 
+EXAMPLES_DIR=./examples
+ASMEXAMFILES = $(wildcard $(EXAMPLES_DIR)/*.s)
+EXAMPCORFILES = $(ASMEXAMFILES:.s=.cor)
+
 .PHONY: corewar-test
 corewar-test: as $(CORFILES)
 	@echo $(CORFILES)
 	go test ./pkg/corewar
-%.cor: %.asm
-	./as $<
+%.cor: %.s
+	./asm $<
+
