@@ -4,7 +4,7 @@ import "io"
 
 type PlayerData struct {
 	CustomID int
-	Data     io.Reader
+	Data     io.ReadCloser
 }
 
 type player struct {

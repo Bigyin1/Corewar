@@ -17,7 +17,7 @@ func NewVM(log bool) *VM {
 	}
 }
 
-func (vm *VM) Start(pd ...PlayerData) error {
+func (vm *VM) Init(pd ...PlayerData) error {
 	var pCount int
 
 	pCount = len(pd)
@@ -74,13 +74,13 @@ type playerHeader struct {
 	Null2    [len(consts.NullSeq)]byte
 }
 
-func parseHeader(d io.Reader, id int) (player, error) {
+func parseHeader(d io.ReadCloser, id int) (player, error) {
 	var p player
 	var h playerHeader
 
 	err := binary.Read(d, binary.BigEndian, &h)
 	if err != nil {
-		return player{}, err
+		return player{}, fmt.Errorf("player %d, has invalid code header", id)
 	}
 	p.id = id
 	if string(h.Magic[:]) != consts.MagicHeader {
@@ -106,6 +106,7 @@ func parseHeader(d io.Reader, id int) (player, error) {
 	if len(code) != int(h.CodeSize) {
 		return player{}, fmt.Errorf("player %d, hs longer code, than was mentioned in header", id)
 	}
+	_ = d.Close()
 	p.code = code
 	return p, nil
 }
