@@ -1,6 +1,7 @@
 package corewar
 
 import (
+	"corewar/pkg/config"
 	"corewar/pkg/testhelpers"
 	"os"
 	"testing"
@@ -10,16 +11,16 @@ func TestVM_Start(t *testing.T) {
 	tstDataDir := "./testdata/"
 	testPlayers := []string{"test1.cor", "test2.cor"}
 
-	d := make([]PlayerData, 0, len(testPlayers))
+	d := make([]config.PlayerData, 0, len(testPlayers))
 
 	for _, fn := range testPlayers {
 		f, err := os.Open(tstDataDir + fn)
 		if err != nil {
 			t.FailNow()
 		}
-		d = append(d, PlayerData{Data: f})
+		d = append(d, config.PlayerData{Data: f})
 	}
-	vm := NewVM(false)
+	vm := NewVM(&config.Config{})
 	err := vm.Init(d...)
 	if err != nil {
 		t.Errorf("got error: %s", err.Error())

@@ -65,10 +65,11 @@ type VM struct {
 	currCycle    int
 	liveOps      int
 	cyclesToDie  int
-	eqInARow     int // for ho many checks, cyclesToDie is equal
+	eqInARow     int
 	checksPassed int
-	log          bool
-	dump         bool
+
+	log  bool
+	dump int
 }
 
 func (vm *VM) check() {
@@ -114,6 +115,10 @@ func (vm *VM) GetWinner() string {
 	return vm.lastAlive.name
 }
 
+func (vm *VM) IsEnded() bool {
+	return vm.procs.IsEmpty()
+}
+
 func (vm *VM) Cycle() (isEnd bool) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -121,6 +126,12 @@ func (vm *VM) Cycle() (isEnd bool) {
 			log.Fatalln(err)
 		}
 	}()
+
+	if vm.currCycle == vm.dump {
+		vm.field.dump(os.Stdout)
+		isEnd = true
+		return
+	}
 
 	vm.procs.Exec((*proc).Cycle)
 	vm.check()

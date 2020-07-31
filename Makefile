@@ -18,8 +18,8 @@ examples: $(EXAMPCORFILES)
 #tests
 TEST_VM_DIR=pkg/corewar/testdata
 
-ASMTESTFILES = $(wildcard $(TEST_VM_DIR)/*.asm)
-CORFILES = $(ASMTESTFILES:.asm=.cor)
+ASMTESTFILES = $(wildcard $(TEST_VM_DIR)/*.s)
+CORFILES = $(ASMTESTFILES:.s=.cor)
 
 EXAMPLES_DIR=./examples
 ASMEXAMFILES = $(wildcard $(EXAMPLES_DIR)/*.s)

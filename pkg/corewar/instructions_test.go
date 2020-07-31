@@ -1,6 +1,7 @@
 package corewar
 
 import (
+	"corewar/pkg/config"
 	"corewar/pkg/consts"
 	"reflect"
 	"testing"
@@ -38,7 +39,7 @@ func newTestVM() *testVM {
 	pc := 0
 	fieldSz := 33
 
-	vm := NewVM(false)
+	vm := NewVM(&config.Config{})
 	vm.field = newField(fieldSz)
 	vm.players = []player{{id: 1}, {id: 2}, {id: 3}}
 	testProc := newProc(1, playerID, pc, vm)

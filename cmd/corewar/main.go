@@ -1,6 +1,7 @@
 package main
 
 import (
+	"corewar/pkg/config"
 	"corewar/pkg/corewar"
 	"flag"
 	"fmt"
@@ -8,13 +9,10 @@ import (
 	"strings"
 )
 
-type config struct {
-	log     bool
-	players []corewar.PlayerData
-}
-
-func (c *config) Read() {
-	flag.BoolVar(&c.log, "log", false, "log execution history to stdout")
+func readCfg(c *config.Config) {
+	flag.BoolVar(&c.Log, "log", false, "log execution history to stdout")
+	flag.IntVar(&c.Dump, "dump", -1,
+		"dump game map state during provided cycle to stdout, then stop execution")
 	flag.Parse()
 
 	for _, fName := range flag.Args() {
@@ -28,16 +26,16 @@ func (c *config) Read() {
 			_, _ = fmt.Fprintf(os.Stderr, "failed to open %s\n", fName)
 			os.Exit(1)
 		}
-		c.players = append(c.players, corewar.PlayerData{Data: f})
+		c.Players = append(c.Players, config.PlayerData{Data: f})
 	}
 }
 
 func main() {
-	var cfg config
+	var cfg config.Config
 
-	cfg.Read()
-	vm := corewar.NewVM(cfg.log)
-	if err := vm.Init(cfg.players...); err != nil {
+	readCfg(&cfg)
+	vm := corewar.NewVM(&cfg)
+	if err := vm.Init(cfg.Players...); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s", err.Error())
 		os.Exit(1)
 	}
@@ -45,6 +43,8 @@ func main() {
 	vm.IntroducePlayers(os.Stdout)
 	for !vm.Cycle() {
 	}
-	winnerName := vm.GetWinner()
-	fmt.Printf("Player %s won!\n", winnerName)
+	if vm.IsEnded() {
+		winnerName := vm.GetWinner()
+		fmt.Printf("Player %s won!\n", winnerName)
+	}
 }

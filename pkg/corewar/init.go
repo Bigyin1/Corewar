@@ -2,6 +2,7 @@ package corewar
 
 import (
 	"bytes"
+	"corewar/pkg/config"
 	"corewar/pkg/consts"
 	"encoding/binary"
 	"fmt"
@@ -10,14 +11,16 @@ import (
 	"sort"
 )
 
-func NewVM(log bool) *VM {
+func NewVM(cfg *config.Config) *VM {
+
 	return &VM{
 		cyclesToDie: consts.CyclesToDie,
-		log:         log,
+		log:         cfg.Log,
+		dump:        cfg.Dump,
 	}
 }
 
-func (vm *VM) Init(pd ...PlayerData) error {
+func (vm *VM) Init(pd ...config.PlayerData) error {
 	var pCount int
 
 	pCount = len(pd)
@@ -38,7 +41,7 @@ func (vm *VM) Init(pd ...PlayerData) error {
 	return nil
 }
 
-func validateIDs(p []PlayerData) error {
+func validateIDs(p []config.PlayerData) error {
 	for i := 0; i < len(p)-1; i++ {
 		if p[i].CustomID == p[i+1].CustomID && p[i].CustomID != 0 {
 			return fmt.Errorf("duplicated id: %d", p[i].CustomID)
@@ -47,7 +50,7 @@ func validateIDs(p []PlayerData) error {
 	return nil
 }
 
-func setupPlayersIDs(p []PlayerData) error {
+func setupPlayersIDs(p []config.PlayerData) error {
 	if err := validateIDs(p); err != nil {
 		return err
 	}
@@ -111,7 +114,7 @@ func parseHeader(d io.ReadCloser, id int) (player, error) {
 	return p, nil
 }
 
-func (vm *VM) loadPlayersMeta(pd []PlayerData) error {
+func (vm *VM) loadPlayersMeta(pd []config.PlayerData) error {
 	for i := range pd {
 		p, err := parseHeader(pd[i].Data, pd[i].CustomID)
 		if err != nil {
