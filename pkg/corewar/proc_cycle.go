@@ -5,29 +5,23 @@ import (
 	"fmt"
 )
 
-type instr struct {
-	meta consts.InstructionMeta
-	f    func(p *proc, a ...arg)
-}
-
-// TODO refactor logic to remove this table
-var opcodeToInstr = []instr{
-	{meta: consts.InstructionsConfig[consts.LIVE], f: Live},
-	{meta: consts.InstructionsConfig[consts.LD], f: Ld},
-	{meta: consts.InstructionsConfig[consts.ST], f: St},
-	{meta: consts.InstructionsConfig[consts.ADD], f: Add},
-	{meta: consts.InstructionsConfig[consts.SUB], f: Sub},
-	{meta: consts.InstructionsConfig[consts.AND], f: And},
-	{meta: consts.InstructionsConfig[consts.OR], f: Or},
-	{meta: consts.InstructionsConfig[consts.XOR], f: Xor},
-	{meta: consts.InstructionsConfig[consts.ZJMP], f: Zjmp},
-	{meta: consts.InstructionsConfig[consts.LDI], f: Ldi},
-	{meta: consts.InstructionsConfig[consts.STI], f: Sti},
-	{meta: consts.InstructionsConfig[consts.FORK], f: Fork},
-	{meta: consts.InstructionsConfig[consts.LLD], f: Lld},
-	{meta: consts.InstructionsConfig[consts.LLDI], f: Lldi},
-	{meta: consts.InstructionsConfig[consts.LFORK], f: Lfork},
-	{meta: consts.InstructionsConfig[consts.AFF], f: Aff},
+var opcodeToInstr = []func(p *proc, a ...arg){
+	Live,
+	Ld,
+	St,
+	Add,
+	Sub,
+	And,
+	Or,
+	Xor,
+	Zjmp,
+	Ldi,
+	Sti,
+	Fork,
+	Lld,
+	Lldi,
+	Lfork,
+	Aff,
 }
 
 func (p *proc) getArgSize(tid consts.TypeID) int {
@@ -144,8 +138,8 @@ func (p *proc) setOpCode() {
 	}
 	p.currOpCode = p.vm.field.getByte(p.pc)
 	if p.currOpCode <= 0x10 && p.currOpCode >= 0x01 {
-		op := opcodeToInstr[p.currOpCode-1]
-		p.execLeft = op.meta.CyclesToExec
+		meta := consts.InstructionsConfig[p.currOpCode-1]
+		p.execLeft = meta.CyclesToExec
 	}
 
 }
@@ -159,13 +153,13 @@ func (p *proc) execOp() {
 		return
 	}
 	op := opcodeToInstr[p.currOpCode-1]
-	p.opMeta = op.meta
+	p.opMeta = consts.InstructionsConfig[p.currOpCode-1]
 
 	args, ok := p.getOpArgs()
 	if !ok {
 		return
 	}
-	op.f(p, args...)
+	op(p, args...)
 }
 
 func (p *proc) Cycle() {

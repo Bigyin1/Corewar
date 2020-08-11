@@ -45,9 +45,11 @@ func (t *Tokenizer) isString(currStr string) (string, bool) {
 
 func (t *Tokenizer) isInstruction(currStr string) (consts.InstructionName, bool) {
 	currInstr := consts.InstructionName("")
-	for instrName := range consts.InstructionsConfig {
-		if strings.HasPrefix(currStr, string(instrName)) && len(instrName) > len(currInstr) {
-			currInstr = instrName
+	for i := range consts.InstructionsConfig {
+		iName := consts.InstructionsConfig[i].Name
+		if strings.HasPrefix(currStr,
+			string(iName)) && len(iName) > len(currInstr) {
+			currInstr = iName
 		}
 	}
 	if currInstr == "" {

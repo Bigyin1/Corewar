@@ -92,6 +92,5 @@ const (
 	Sum                     = "SUM"
 	Sub                     = "SUB"
 	Comment                 = "COMMENT"
-	Symbol                  = "SYMBOL"
 	EOF                     = "EOF"
 )

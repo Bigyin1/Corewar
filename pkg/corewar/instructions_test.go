@@ -53,7 +53,7 @@ func newTestVM() *testVM {
 }
 
 func (tvm *testVM) testLive(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LIVE]
+	tvm.p.opMeta = consts.InstructionsConfig[0]
 	arg := arg{consts.TDirIdCode, -1}
 	Live(tvm.p, arg)
 	if tvm.vm.lastAlive.id != -arg.val {
@@ -69,7 +69,7 @@ func (tvm *testVM) testLive(t *testing.T) {
 }
 
 func (tvm *testVM) testLD(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LD]
+	tvm.p.opMeta = consts.InstructionsConfig[1]
 	argDir := arg{consts.TDirIdCode, 42}
 	argReg := arg{consts.TRegIdCode, 2}
 
@@ -97,7 +97,7 @@ func (tvm *testVM) testLD(t *testing.T) {
 }
 
 func (tvm *testVM) testST(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.ST]
+	tvm.p.opMeta = consts.InstructionsConfig[2]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 
@@ -122,7 +122,7 @@ func (tvm *testVM) testST(t *testing.T) {
 }
 
 func (tvm *testVM) testAdd(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.ADD]
+	tvm.p.opMeta = consts.InstructionsConfig[3]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 	argReg3 := arg{consts.TRegIdCode, 2}
@@ -139,7 +139,7 @@ func (tvm *testVM) testAdd(t *testing.T) {
 }
 
 func (tvm *testVM) testSub(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.SUB]
+	tvm.p.opMeta = consts.InstructionsConfig[4]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 	argReg3 := arg{consts.TRegIdCode, 16}
@@ -156,7 +156,7 @@ func (tvm *testVM) testSub(t *testing.T) {
 }
 
 func (tvm *testVM) testAnd(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.AND]
+	tvm.p.opMeta = consts.InstructionsConfig[5]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 	argReg3 := arg{consts.TRegIdCode, 16}
@@ -173,7 +173,7 @@ func (tvm *testVM) testAnd(t *testing.T) {
 }
 
 func (tvm *testVM) testOr(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.OR]
+	tvm.p.opMeta = consts.InstructionsConfig[6]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 	argReg3 := arg{consts.TRegIdCode, 16}
@@ -190,7 +190,7 @@ func (tvm *testVM) testOr(t *testing.T) {
 }
 
 func (tvm *testVM) testXor(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.XOR]
+	tvm.p.opMeta = consts.InstructionsConfig[7]
 	argReg1 := arg{consts.TRegIdCode, 1}
 	argReg2 := arg{consts.TRegIdCode, 2}
 	argReg3 := arg{consts.TRegIdCode, 16}
@@ -207,7 +207,7 @@ func (tvm *testVM) testXor(t *testing.T) {
 }
 
 func (tvm *testVM) testZjmp(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.ZJMP]
+	tvm.p.opMeta = consts.InstructionsConfig[8]
 	// with carry
 
 	currPC := 10
@@ -231,7 +231,7 @@ func (tvm *testVM) testZjmp(t *testing.T) {
 }
 
 func (tvm *testVM) testLdi(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LDI]
+	tvm.p.opMeta = consts.InstructionsConfig[9]
 	// ind dir reg
 
 	argInd1 := arg{consts.TIndIdCode, 6}
@@ -251,7 +251,7 @@ func (tvm *testVM) testLdi(t *testing.T) {
 }
 
 func (tvm *testVM) testSti(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.STI]
+	tvm.p.opMeta = consts.InstructionsConfig[10]
 	// ind dir reg
 
 	argReg1 := arg{consts.TRegIdCode, 16}
@@ -272,7 +272,7 @@ func (tvm *testVM) testSti(t *testing.T) {
 }
 
 func (tvm *testVM) testFork(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.FORK]
+	tvm.p.opMeta = consts.InstructionsConfig[11]
 
 	argDir1 := arg{consts.TDirIdCode, consts.IdxMod + 8}
 
@@ -290,7 +290,7 @@ func (tvm *testVM) testFork(t *testing.T) {
 }
 
 func (tvm *testVM) testLLD(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LLD]
+	tvm.p.opMeta = consts.InstructionsConfig[12]
 	argDir := arg{consts.TDirIdCode, 42}
 	argReg := arg{consts.TRegIdCode, 2}
 
@@ -317,7 +317,7 @@ func (tvm *testVM) testLLD(t *testing.T) {
 }
 
 func (tvm *testVM) testLldi(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LLDI]
+	tvm.p.opMeta = consts.InstructionsConfig[13]
 	// ind dir reg
 
 	argInd1 := arg{consts.TIndIdCode, 6}
@@ -337,7 +337,7 @@ func (tvm *testVM) testLldi(t *testing.T) {
 }
 
 func (tvm *testVM) testLfork(t *testing.T) {
-	tvm.p.opMeta = consts.InstructionsConfig[consts.LFORK]
+	tvm.p.opMeta = consts.InstructionsConfig[14]
 
 	argDir1 := arg{consts.TDirIdCode, consts.IdxMod + 8}
 

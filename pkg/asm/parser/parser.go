@@ -52,7 +52,7 @@ func (p *Parser) argument(instrName consts.InstructionName) InstructionArgument 
 	argType := p.currentToken.Type.GetArgType()
 	arg := InstructionArgument{Token: p.currentToken, Type: argType}
 	if p.currentToken.Type.IsDirectArgType() {
-		arg.Type.Size = consts.InstructionsConfig[instrName].TDirSize // set alternative dir size
+		arg.Type.Size = consts.InstructionsConfig.FindByName(instrName).TDirSize // set alternative dir size
 	}
 	_ = p.eatToken(p.currentToken.Type)
 	return arg
@@ -62,7 +62,7 @@ func (p *Parser) instruction() (InstructionNode, error) {
 	var instrNode InstructionNode
 	instrNode.Name = p.currentToken.Value.(consts.InstructionName)
 	instrNode.Token = p.currentToken
-	instrNode.Meta = consts.InstructionsConfig[instrNode.Name]
+	instrNode.Meta = consts.InstructionsConfig.FindByName(instrNode.Name)
 	err := p.eatToken(tokenizer.Instr)
 	if err != nil {
 		return InstructionNode{}, err

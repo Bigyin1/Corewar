@@ -1,36 +1,48 @@
 package consts
 
 type InstructionMeta struct {
+	Name          InstructionName
 	AllowedArgs   []TypeID
 	IsArgTypeCode bool
 	TDirSize      int
 	OpCode        byte
 	CyclesToExec  int
 }
+type InstrConfig []InstructionMeta
 
-var InstructionsConfig = map[InstructionName]InstructionMeta{
-	LIVE: {AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirArgSize, OpCode: 0x01, CyclesToExec: 10},
-	LD: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x02,
+var InstructionsConfig = InstrConfig{
+	{Name: LIVE, AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: DirArgSize, OpCode: 0x01, CyclesToExec: 10},
+	{Name: LD, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x02,
 		CyclesToExec: 5},
-	ST: {AllowedArgs: []TypeID{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x03,
+	{Name: ST, AllowedArgs: []TypeID{TRegIdCode, TRegIdCode | TIndIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x03,
 		CyclesToExec: 5},
-	ADD: {AllowedArgs: []TypeID{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x04, CyclesToExec: 10},
-	SUB: {AllowedArgs: []TypeID{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x05, CyclesToExec: 10},
-	AND: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
+	{Name: ADD, AllowedArgs: []TypeID{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x04, CyclesToExec: 10},
+	{Name: SUB, AllowedArgs: []TypeID{TRegIdCode, TRegIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x05, CyclesToExec: 10},
+	{Name: AND, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x06, CyclesToExec: 6},
-	OR: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
+	{Name: OR, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x07, CyclesToExec: 6},
-	XOR: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
+	{Name: XOR, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x08, CyclesToExec: 6},
-	ZJMP: {AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x09, CyclesToExec: 20},
-	LDI: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
+	{Name: ZJMP, AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x09, CyclesToExec: 20},
+	{Name: LDI, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0A, CyclesToExec: 25},
-	STI: {AllowedArgs: []TypeID{TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode},
+	{Name: STI, AllowedArgs: []TypeID{TRegIdCode, TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode},
 		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0B, CyclesToExec: 25},
-	FORK: {AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0C, CyclesToExec: 800},
-	LLD:  {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x0D, CyclesToExec: 10},
-	LLDI: {AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
+	{Name: FORK, AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0C, CyclesToExec: 800},
+	{Name: LLD, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode, TRegIdCode}, IsArgTypeCode: true, TDirSize: DirArgSize, OpCode: 0x0D, CyclesToExec: 10},
+	{Name: LLDI, AllowedArgs: []TypeID{TDirIdCode | TIndIdCode | TRegIdCode, TRegIdCode | TDirIdCode, TRegIdCode},
 		IsArgTypeCode: true, TDirSize: ShortDirSize, OpCode: 0x0E, CyclesToExec: 50},
-	LFORK: {AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0F, CyclesToExec: 1000},
-	AFF:   {AllowedArgs: []TypeID{TRegIdCode}, IsArgTypeCode: false, TDirSize: DirArgSize, OpCode: 0x10},
+	{Name: LFORK, AllowedArgs: []TypeID{TDirIdCode}, IsArgTypeCode: false, TDirSize: ShortDirSize, OpCode: 0x0F, CyclesToExec: 1000},
+	{Name: AFF, AllowedArgs: []TypeID{TRegIdCode}, IsArgTypeCode: false, TDirSize: DirArgSize, OpCode: 0x10},
+}
+
+func (ic *InstrConfig) FindByName(iName InstructionName) InstructionMeta {
+	for i := range InstructionsConfig {
+		cfg := InstructionsConfig[i]
+		if iName == cfg.Name {
+			return cfg
+		}
+	}
+	return InstructionMeta{}
 }
