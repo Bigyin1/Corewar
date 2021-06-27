@@ -1,2 +1,2 @@
-// Corewar assembler
+// github.com/Bigyin1/Corewar assembler
 package asm

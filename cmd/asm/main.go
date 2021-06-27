@@ -1,15 +1,16 @@
 package main
 
 import (
-	"corewar/pkg/asm/compiler"
-	"corewar/pkg/asm/parser"
-	"corewar/pkg/asm/tokenizer"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/Bigyin1/Corewar/pkg/asm/compiler"
+	"github.com/Bigyin1/Corewar/pkg/asm/parser"
+	"github.com/Bigyin1/Corewar/pkg/asm/tokenizer"
 )
 
 func compile(input string) (*compiler.Compiler, error) {

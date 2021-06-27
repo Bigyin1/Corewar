@@ -1,8 +1,9 @@
 package tokenizer
 
 import (
-	"corewar/pkg/consts"
 	"errors"
+
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 type ArgumentType struct {

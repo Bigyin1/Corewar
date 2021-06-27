@@ -1,10 +1,11 @@
 package corewar
 
 import (
-	"corewar/pkg/config"
-	"corewar/pkg/testhelpers"
 	"os"
 	"testing"
+
+	"github.com/Bigyin1/Corewar/pkg/config"
+	"github.com/Bigyin1/Corewar/pkg/testhelpers"
 )
 
 func TestVM_Start(t *testing.T) {

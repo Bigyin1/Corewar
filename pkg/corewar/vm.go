@@ -1,11 +1,12 @@
 package corewar
 
 import (
-	"corewar/pkg/consts"
 	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 type procList struct {

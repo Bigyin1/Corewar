@@ -1,7 +1,7 @@
 package corewar
 
 import (
-	"corewar/pkg/consts"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 func newProc(id, plID, initPos int, vm *VM) *proc {

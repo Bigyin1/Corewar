@@ -1,10 +1,11 @@
 package corewar
 
 import (
-	"corewar/pkg/config"
-	"corewar/pkg/consts"
 	"reflect"
 	"testing"
+
+	"github.com/Bigyin1/Corewar/pkg/config"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 func TestInstructions(t *testing.T) {

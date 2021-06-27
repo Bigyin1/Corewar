@@ -1,10 +1,11 @@
 package tokenizer
 
 import (
-	"corewar/pkg/consts"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 func (t *Tokenizer) isLabel(currStr string) (string, bool) {

@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"corewar/pkg/asm/tokenizer"
-	"corewar/pkg/consts"
+	"github.com/Bigyin1/Corewar/pkg/asm/tokenizer"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 type ProgramNode struct {

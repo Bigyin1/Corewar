@@ -2,12 +2,13 @@ package compiler
 
 import (
 	"bytes"
-	"corewar/pkg/asm/parser"
-	"corewar/pkg/consts"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/Bigyin1/Corewar/pkg/asm/parser"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 type Compiler struct {

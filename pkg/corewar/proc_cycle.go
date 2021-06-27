@@ -1,8 +1,9 @@
 package corewar
 
 import (
-	"corewar/pkg/consts"
 	"fmt"
+
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 var opcodeToInstr = []func(p *proc, a ...arg){

@@ -1,10 +1,11 @@
 package compiler
 
 import (
-	"corewar/pkg/asm/parser"
-	"corewar/pkg/asm/tokenizer"
-	"corewar/pkg/consts"
 	"fmt"
+
+	"github.com/Bigyin1/Corewar/pkg/asm/parser"
+	"github.com/Bigyin1/Corewar/pkg/asm/tokenizer"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 func (c Compiler) getExpectedArgTypes(expArgCodes consts.TypeID) string {

@@ -28,6 +28,6 @@ CORFILES = $(ASMTESTFILES:.s=.cor)
 corewar-test: as $(CORFILES)
 	@echo $(CORFILES)
 	go test ./pkg/corewar
-%.cor: %.s as
+%.cor: %.s
 	./as $<
 

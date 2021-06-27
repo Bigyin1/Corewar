@@ -2,13 +2,14 @@ package corewar
 
 import (
 	"bytes"
-	"corewar/pkg/config"
-	"corewar/pkg/consts"
 	"encoding/binary"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"sort"
+
+	"github.com/Bigyin1/Corewar/pkg/config"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 func NewVM(cfg *config.Config) *VM {

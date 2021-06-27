@@ -1,9 +1,10 @@
 package parser
 
 import (
-	"corewar/pkg/asm/tokenizer"
-	"corewar/pkg/consts"
 	"fmt"
+
+	"github.com/Bigyin1/Corewar/pkg/asm/tokenizer"
+	"github.com/Bigyin1/Corewar/pkg/consts"
 )
 
 type Parser struct {
