@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Bigyin1/Corewar/pkg/config"
-	"github.com/Bigyin1/Corewar/pkg/github.com/Bigyin1/Corewar"
+	"github.com/Bigyin1/Corewar/pkg/corewar"
 )
 
 func readCfg(c *config.Config) {
@@ -35,7 +35,7 @@ func main() {
 	var cfg config.Config
 
 	readCfg(&cfg)
-	vm := github.com / Bigyin1 / Corewar.NewVM(&cfg)
+	vm := corewar.NewVM(&cfg)
 	if err := vm.Init(cfg.Players...); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%s", err.Error())
 		os.Exit(1)
